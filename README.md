@@ -1,0 +1,1 @@
+This code provides the complete analysis process of GeTeSEPdb database, including data preprocessing, clustering using clust software, regression analysis to identify specific expression pattern genes and enrichment analysis.
