@@ -21,27 +21,18 @@ PreProcess <- function(sampleinfo,rslt){
     combineresult <- read.delim('~/mqf/Temporal/workflow/src/combineresult.txt')
     srr <- combineresult[combineresult$GSM %in% sample,]$SRR
     data_dir <- '~/RNA-seq/temporal/combine'
-    all_profile <- fread(paste0(data_dir,'/',species,'_allprofile_count.csv'),sep = ',') %>% as.data.frame()
-    raw_data <- all_profile[,which(colnames(all_profile) %in% c('Geneid',srr,"Length"))]
-    raw_data <- raw_data[,c('Geneid',srr,"Length")]
+    all_profile <- fread(paste0(data_dir,'/',species,'_allprofile_count_shift.csv'),sep = ',') %>% as.data.frame()
+    raw_data <- all_profile[,which(colnames(all_profile) %in% c('Geneid',srr))]
+    raw_data <- raw_data[,c('Geneid',srr)]
     ##替换列名
     names(raw_data) <- combineresult$GSM[match(names(raw_data),combineresult$SRR)]
     colnames(raw_data)[1] <- 'Geneid'
-    colnames(raw_data)[ncol(raw_data)] <- 'Length'
-    raw_data <- raw_data[,c('Geneid',sample,'Length')]  ###确保列名的顺序与时序一致
+    raw_data <- raw_data[,c('Geneid',sample)]  ###确保列名的顺序与时序一致
     #2023.06.17，先全部转成Entrezid，后续再转回来
     raw_data <- left_join(sym_enz_ens,raw_data,by=c('Symbol' = 'Geneid')) %>% drop_na()
     raw_data <- raw_data[,-'Symbol'] %>% as.data.frame()
     
-    mycounts <- raw_data[,c(-ncol(raw_data))] %>% column_to_rownames(.,'GeneID')
-    #计算TPM
-    len <- raw_data$Length
-    kb <- len / 1000
-    RPKM <- mycounts / kb
-    exp <- t(t(RPKM)/colSums(RPKM) * 1000000) %>% as.data.frame()
-    exp$GeneID <- rownames(exp)
-    exp <- exp[,c(ncol(exp),1:(ncol(exp)-1))]
-    write.table(exp,file = paste0(rslt,'/tpm_profile.txt'),row.names = F,sep = '\t',quote = F)
+    write.table(raw_data,file = paste0(rslt,'/tpm_profile.txt'),row.names = F,sep = '\t',quote = F)
     write.table(raw_data,file = paste0(rslt,'/raw_profile.txt'),row.names = F,sep = '\t',quote = F)
   }else{
     #读取数据

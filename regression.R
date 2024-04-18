@@ -8,6 +8,7 @@ library(Hmisc)
 library(rms)
 library(mgcv)
 library(caret)
+library(tidyverse)
 library(MASS)
 library(drc)
 library(nlme)
@@ -15,7 +16,6 @@ library(aomisc)
 library(dplyr)
 library(tibble)
 library(data.table)
-library(tidyverse)
 
 Regression <- function(sampleinfo,rslt){
   studyid <- unique(sampleinfo$Studyid)
@@ -50,33 +50,7 @@ Regression <- function(sampleinfo,rslt){
       Logis <- fit_logis(data)
       Sin <- fit_sin(data)
       Quadratic <- fit_Gaussian(data)
-      
-      
-      # ggplot(data.frame(time = time, gene_expr = gene_expr, lm_pred = lm_pred,Logis_pred = Logis_pred,exp_pred = exp_pred,
-      #                   loglm_pred = loglm_pred,Gaussian_pred = Gaussian_pred,sin_pred = sin_pred,
-      #                   power_pred = power_pred), aes(x = time)) +
-      #   geom_point(aes(y = gene_expr, color = "gene_expr"), size = 1) +
-      #   geom_line(aes(y = lm_pred, color = "lm_pred"), size = 1) +
-      #   geom_line(aes(y = exp_pred, color = "exp_pred"), size = 1) +
-      #   geom_line(aes(y = sin_pred, color = "sin_pred"), size = 1) +
-      #   geom_line(aes(y = power_pred, color = "power_pred"), size = 1) +
-      #   geom_line(aes(y = Logis_pred, color = "Logis_pred"), size = 1) +
-      #   geom_line(aes(y = loglm_pred, color = "loglm_pred"), size = 1) +
-      #   geom_line(aes(y = Gaussian_pred, color = "Gaussian_pred"), size = 1) +
-      #   ggtitle(paste0("Gene: ", rownames(Eigengenes)[clu])) +
-      #   xlab("Time") +
-      #   ylab("Gene Expression") +
-      #   theme_bw() +
-      #   scale_color_manual(name = "Legend Title",
-      #                      values = c("gene_expr" = "black", "lm_pred" = "red", "exp_pred" = "green",
-      #                                 "sin_pred" = "blue","power_pred" = "turquoise",
-      #                                 "Logis_pred" = "purple","loglm_pred" = "orange","Gaussian_pred" = "yellow"),
-      #                      labels = c("gene_expr" = "Observed", "lm_pred" = "Linear", "exp_pred" = "Exponential",
-      #                                 "sin_pred" = "Sine", "loglm_pred" = "log",
-      #                                 "power_pred" = "power","Logis_pred" = "logistic","Gaussian_pred" = "poly2")) +
-      #   guides(color = guide_legend(override.aes = list(linewidth = 1, linetype = 1)))
-      
-      
+    
       Modles <- list(Linear,exponential_growth,exponential_decay,Logarithmic,Power,Logis,Sin,Quadratic)
       names(Modles) <- c('Linear','exponential_growth','exponential_decay','Logarithmic','Power','Logis','Sin','Quadratic')
       #比较各个参数，通过rank并给定权重，选择最优模型
@@ -84,59 +58,40 @@ Regression <- function(sampleinfo,rslt){
       for(modle in names(Modles)){
         df <- Modles[[modle]]$result
         rownames(df) <- modle
-        colnames(df) <- c('rmse','rsq','aicc')
+        colnames(df) <- c('rmse','rsq','adjrsq','aicc')
         Goodness <- rbind(Goodness,df)
       }
       Goodness$cluster <- paste0('cluster_',clu)
-      if(TRUE %in% (Goodness$rsq > 0.7)){  ##这里先判断是否有模型的R2大于0.7，如果没有就算是拟合失败
-        # Goodness_rank <- data.frame(rmse.rank = rank(Goodness$rmse), rsq.rank = rank(Goodness$rsq), aicc.rank = rank(Goodness$aicc),row.names = rownames(Goodness))
-        # Goodness_rank$rank <- rank(apply(Goodness_rank, 1, function(x) -0.5*x[1]+2*x[2]-0.5*x[3]))
-        # # print(paste0("The cluster_",c," best fit is ",rownames(Goodness_rank[which(Goodness_rank$rank == 7),])))
-        # best_model <- rownames(Goodness_rank[Goodness_rank$rank == max(Goodness_rank$rank),])
-        # cluster_gene <- Clusters[,clu][nchar(Clusters[,clu])>0]  ##去除了有些空的字符串
-        # cluster_gene_tpm <- processed_tpm[processed_tpm$Genes %in% cluster_gene,] %>% remove_rownames %>%
-        #   column_to_rownames(.,'Genes')
-        # for(m in best_model){
-        #   bm <- Modles[[m]]$modle   ###bm:best model
-        #   #再对各个cluster中的基因使用最佳模型进行拟合，控制R2阈值，保留R2>0.9的基因做后续分析
-        #   res_gene_rsq <- apply(cluster_gene_tpm, 1, function(y){
-        #     pred <- predict(bm)
-        #     # rmse <- sqrt(mean((pred - y)^2))
-        #     tss <- sum((y - mean(y))^2)
-        #     rss <- sum((y - pred)^2)
-        #     ssr <- tss - rss
-        #     rsq <- ssr / tss
-        #     return(rsq)
-        #   })
-        #   res_gene <- names(res_gene_rsq[res_gene_rsq > 0.8])
-        #   res_gene_df <- processed_tpm[processed_tpm$Genes %in% res_gene,]
-        #   res_gene_df$cluster <- paste0('cluster_',clu)
-        #   if(m == 'exponential_growth' || m == 'exponential_decay'){
-        #     m_1 = 'Exponential'
-        #   }else{
-        #     m_1 = m
-        #   }
-        #   res_gene_df$model <- m_1
-        #   ResGeneDf <- rbind(ResGeneDf,res_gene_df)
-        best_model <- rownames(Goodness[Goodness$rsq > 0.7,])
-        cluster_gene <- Clusters[,c][nchar(Clusters[,c])>0]  ##去除了有些空的字符串
+      if(TRUE %in% (Goodness$adjrsq > 0.7)){  
+        best_model <- rownames(Goodness[Goodness$adjrsq > 0.7,])
+        cluster_gene <- Clusters[,clu][nchar(Clusters[,clu])>0]  ##去除了有些空的字符串
         cluster_gene_tpm <- processed_tpm[processed_tpm$Genes %in% cluster_gene,] %>% remove_rownames %>%
           column_to_rownames(.,'Genes')
         for(m in best_model){
-          bm <- Modles[[m]]$modle   ###bm:best model
+          bm <- Modles[[m]]$modle
+          if(m=='Quadratic'){
+            p<- 3
+          }else if(m=='Sin' | m=='Logis'){
+            p<- 4
+          }else{
+            p<- 2
+          }
+        
+          
           #再对各个cluster中的基因使用最佳模型进行拟合，控制R2阈值，保留R2>0.9的基因做后续分析
           res_gene_rsq <- apply(cluster_gene_tpm, 1, function(y) {
             pred <- predict(bm)
-            # rmse <- sqrt(mean((pred - y)^2))
             tss <- sum((y - mean(y))^2)
             rss <- sum((y - pred)^2)
             ssr <- tss - rss
             rsq <- ssr / tss
-            return(rsq)
+            n <- length(y)
+            ajr2 <- 1 - ((1 - rsq) * (n - 1)) / (n - p - 1)
+            return(ajr2)
           })
           res_gene <- names(res_gene_rsq[res_gene_rsq > 0.7])
           res_gene_df <- processed_tpm[processed_tpm$Genes %in% res_gene,]
-          res_gene_df$cluster <- paste0('cluster_',c)
+          res_gene_df$cluster <- paste0('cluster_',clu)
           res_gene_df$model <- m
           ResGeneDf <- rbind(ResGeneDf,res_gene_df)
           #输出ModelDf
@@ -276,19 +231,19 @@ Regression <- function(sampleinfo,rslt){
     browse_gene_2 <- constantDF_mean[,c('Studyid','cluster','model','Genes','CV','mean')]
     browse_gene <- rbind(browse_gene_2,browse_gene_1)
     
-    write.csv(ResGeneDf, file = paste0(rslt,'/ResGeneDF.csv'),row.names = F)
-    write.csv(ModelDf,file = paste0(rslt,'/ModelDF.csv'),row.names = F)
-    write.csv(EvaIndicators,paste0(rslt,'/EvaIndicators.csv'),row.names = F)
-    write.csv(constantDF_mean,paste0(rslt,'/ConstantDF.csv'),row.names = F)
-    write.csv(browse_gene,paste0(rslt,'/BrowseGene.csv'),row.names = F)
+    write.csv(ResGeneDf, file = paste0(rslt,'/ResGeneDF0409.csv'),row.names = F)
+    write.csv(ModelDf,file = paste0(rslt,'/ModelDF0409.csv'),row.names = F)
+    write.csv(EvaIndicators,paste0(rslt,'/EvaIndicators0409.csv'),row.names = F)
+    write.csv(constantDF_mean,paste0(rslt,'/ConstantDF0409.csv'),row.names = F)
+    write.csv(browse_gene,paste0(rslt,'/BrowseGene0409.csv'),row.names = F)
   }else{
     sym_enz_ens <- fread(paste0('~/mqf/Temporal/workflow/src/',species,'_sym_enz_ens.txt')) %>% dplyr::select(.,c('GeneID','Symbol'))
     constantDF_mean <- left_join(sym_enz_ens,constantDF_mean,by = c('GeneID'='Genes')) %>% drop_na() %>% dplyr::select(.,-'GeneID')
     colnames(constantDF_mean)[1] <- 'Genes'
     browse_gene <- constantDF_mean[,c('Studyid','cluster','model','Genes','CV','mean')]
     
-    write.csv(constantDF_mean,paste0(rslt,'/ConstantDF.csv'),row.names = F)
-    write.csv(browse_gene,paste0(rslt,'/BrowseGene.csv'),row.names = F)
+    write.csv(constantDF_mean,paste0(rslt,'/ConstantDF0409.csv'),row.names = F)
+    write.csv(browse_gene,paste0(rslt,'/BrowseGene0409.csv'),row.names = F)
   }
   
 }
@@ -302,8 +257,9 @@ fit_linear <- function(data){
   lm_pred <- predict(lm_fit)
   lm_rmse <- sqrt(mean((lm_pred - y)^2))
   lm_r2 <- summary(lm_fit)$r.squared
+  lm_ajr2 <- summary(lm_fit)$adj.r.squared
   lm_aicc <- AIC(lm_fit)
-  lm_result=data.frame(lm_rmse=lm_rmse,lm_r2=lm_r2,lm_aicc=lm_aicc)
+  lm_result=data.frame(lm_rmse=lm_rmse,lm_r2=lm_r2,lm_ajr2=lm_ajr2,lm_aicc=lm_aicc)
   return(list(modle = lm_fit, result = lm_result))
 }
 #指数增长模型
@@ -319,7 +275,11 @@ fit_exp_growth <- function(data){
   exp_rsq <- exp_ssr / exp_tss# Calculate R^2
   exp_rmse <- sqrt(mean((exp_pred - y)^2))
   exp_aicc <- AIC(exp_fit)
-  exp_result=data.frame(exp_rmse=exp_rmse,exp_rsq=exp_rsq,exp_aicc=exp_aicc)
+  n <- length(y)
+  p <- 2 # Assuming 2 parameters in the model
+  exp_ajr2 <- 1 - ((1 - exp_rsq) * (n - 1)) / (n - p - 1) # Calculate adjusted R^2
+  exp_result <- data.frame(exp_rmse=exp_rmse, exp_rsq=exp_rsq, exp_ajr2=exp_ajr2, exp_aicc=exp_aicc)
+  #exp_result=data.frame(exp_rmse=exp_rmse,exp_rsq=exp_rsq,exp_aicc=exp_aicc)
   return(list(modle = exp_fit,result = exp_result))
 }
 #指数递减模型
@@ -335,7 +295,11 @@ fit_exp_decay <- function(data){
   exp_rsq <- exp_ssr / exp_tss# Calculate R^2
   exp_rmse <- sqrt(mean((exp_pred - y)^2))
   exp_aicc <- AIC(exp_fit)
-  exp_result=data.frame(exp_rmse=exp_rmse,exp_rsq=exp_rsq,exp_aicc=exp_aicc)
+  n <- length(y)
+  p <- 2 # Assuming 2 parameters in the model
+  exp_ajr2 <- 1 - ((1 - exp_rsq) * (n - 1)) / (n - p - 1) # Calculate adjusted R^2
+  exp_result <- data.frame(exp_rmse=exp_rmse, exp_rsq=exp_rsq, exp_ajr2=exp_ajr2, exp_aicc=exp_aicc)
+  #exp_result=data.frame(exp_rmse=exp_rmse,exp_rsq=exp_rsq,exp_aicc=exp_aicc)
   return(list(modle = exp_fit,result = exp_result))
 }
 #对数函数
@@ -351,7 +315,11 @@ fit_log <- function(data){
   loglm_rsq <- loglm_ssr / loglm_tss# Calculate R^2
   loglm_rmse <- sqrt(mean((loglm_pred - y)^2))
   loglm_aicc <- AIC(loglm_fit)
-  loglm_result=data.frame(loglm_rmse=loglm_rmse,loglm_rsq=loglm_rsq,loglm_aicc=loglm_aicc)
+  n <- length(y)
+  p <- 2 # Assuming 2 parameters in the model
+  loglm_ajr2 <- 1 - ((1 - loglm_rsq) * (n - 1)) / (n - p - 1) # Calculate adjusted R^2
+  loglm_result <- data.frame(loglm_rmse=loglm_rmse,loglm_rsq=loglm_rsq, loglm_ajr2=loglm_ajr2,loglm_aicc=loglm_aicc)
+  #loglm_result=data.frame(loglm_rmse=loglm_rmse,loglm_rsq=loglm_rsq,loglm_aicc=loglm_aicc)
   return(list(modle = loglm_fit, result = loglm_result))
 }
 #幂函数
@@ -366,7 +334,11 @@ fit_power <- function(data){
   power_rsq <- power_ssr / power_tss# Calculate R^2
   power_rmse <- sqrt(mean((power_pred - y)^2))
   power_aicc <- AIC(power_fit)
-  power_result=data.frame(power_rmse=power_rmse,power_rsq=power_rsq,power_aicc=power_aicc)
+  n <- length(y)
+  p <- 2 # Assuming 2 parameters in the model
+  power_ajr2 <- 1 - ((1 - power_rsq) * (n - 1)) / (n - p - 1) # Calculate adjusted R^2
+  power_result <- data.frame(power_rmse=power_rmse,power_rsq=power_rsq, power_ajr2=power_ajr2,power_aicc=power_aicc)
+  #power_result=data.frame(power_rmse=power_rmse,power_rsq=power_rsq,power_aicc=power_aicc)
   return(list(modle = power_fit,result = power_result))
 }
 #逻辑回归
@@ -381,7 +353,11 @@ fit_logis <- function(data){
   Logis_rsq <- Logis_ssr / Logis_tss# Calculate R^2
   Logis_rmse <- sqrt(mean((Logis_pred - y)^2))
   Logis_aicc <- AIC(Logis_fit)
-  Logis_result=data.frame(Logis_rmse=Logis_rmse,Logis_rsq=Logis_rsq,Logis_aicc=Logis_aicc)
+  n <- length(y)
+  p <- 4 # Assuming 2 parameters in the model
+  Logis_ajr2 <- 1 - ((1 - Logis_rsq) * (n - 1)) / (n - p - 1) # Calculate adjusted R^2
+  Logis_result <- data.frame(Logis_rmse=Logis_rmse,Logis_rsq=Logis_rsq, Logis_ajr2=Logis_ajr2,Logis_aicc=Logis_aicc)
+  #Logis_result=data.frame(Logis_rmse=Logis_rmse,Logis_rsq=Logis_rsq,Logis_aicc=Logis_aicc)
   return(list(modle = Logis_fit, result = Logis_result))
 }
 #三角函数
@@ -412,7 +388,11 @@ fit_sin <- function(data){
   sin_ssr <- sin_tss - sin_rss # Calculate SSR
   sin_rsq <- sin_ssr / sin_tss# Calculate R^2
   sin_aicc <- AIC(sin_fit)
-  sin_result=data.frame(sin_rmse=sin_rmse,sin_rsq=sin_rsq,sin_aicc=sin_aicc)
+  n <- length(y)
+  p <- 4 # Assuming 2 parameters in the model
+  sin_ajr2 <- 1 - ((1 - sin_rsq) * (n - 1)) / (n - p - 1) # Calculate adjusted R^2
+  sin_result <- data.frame(sin_rmse=sin_rmse,sin_rsq=sin_rsq, sin_ajr2=sin_ajr2,sin_aicc=sin_aicc)
+  #sin_result=data.frame(sin_rmse=sin_rmse,sin_rsq=sin_rsq,sin_aicc=sin_aicc)
   return(list(modle = sin_fit,result = sin_result))
 }
 #高斯函数
@@ -431,26 +411,10 @@ fit_Gaussian <- function(data){
   Gaussian_rsq <- Gaussian_ssr / Gaussian_tss# Calculate R^2
   Gaussian_rmse <- sqrt(mean((Gaussian_pred - y)^2))
   Gaussian_aicc <- AIC(Gaussian_fit)
-  Gaussian_result=data.frame(Gaussian_rmse=Gaussian_rmse,Gaussian_rsq=Gaussian_rsq,Gaussian_aicc=Gaussian_aicc)
+  n <- length(y)
+  p <- 3 # Assuming 2 parameters in the model
+  Gaussian_ajr2 <- 1 - ((1 - Gaussian_rsq) * (n - 1)) / (n - p - 1) # Calculate adjusted R^2
+  Gaussian_result <- data.frame(Gaussian_rmse=Gaussian_rmse,Gaussian_rsq=Gaussian_rsq, Gaussian_ajr2=Gaussian_ajr2,Gaussian_aicc=Gaussian_aicc)
+  #Gaussian_result=data.frame(Gaussian_rmse=Gaussian_rmse,Gaussian_rsq=Gaussian_rsq,Gaussian_aicc=Gaussian_aicc)
   return(list(modle = Gaussian_fit,result = Gaussian_result))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
