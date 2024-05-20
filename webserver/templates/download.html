@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DOWNLOAD</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		{% include 'public_templates/bootstrap.html' %}
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#nav_download").addClass("active");
+				$("#page_title").text('DOWNLOAD');
+			});
+		</script>
+		<style type="text/css">
+			blockquote a {
+				/* color: black; */
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 导航栏 -->
+		{% include 'public_templates/nav_tem.html' %}
+		{% include 'public_templates/page_title.html' %}
+
+		<!-- 下载框 -->
+		<!-- <h6 class="text-center" style="color: #17a2b8;font-size: 20px; margin: 50px 0 50px 0;"></h6> -->
+		<div class="container col-7">
+		<hr />
+			<table class="table table-bordered" style="text-align: center;">
+				<thead class="table-dark bg-info">
+					<tr>
+							<th></th>
+							<th id="newline">RELEASED ON</th>
+
+							<th>VERSION</th>
+							<th>SIZE</th>
+							<th>FORMAT</th>
+							<th>DOWNLOAD</th>
+							<th>DESCRIPTION</th>
+							<!-- <th>SCHEMA DEFINITION</th> -->
+
+					</tr>
+				</thead>
+				<tbody class="bg-white">
+					<tr>
+						<td>Meta-information of Time-series Transcriptomic Datasets</td>
+						<td>2023-12-3</td>
+						<td>1.0</td>
+						<td>5.78 MB</td>
+						<td>TXT</td>
+						<td><a href="download/timeseries_datasets">Download</a></td>
+						<!-- <td><a href="/ddpd/download/xsd_structure">View</a></td> -->
+						<td rowspan="4" colspan="1" style="vertical-align: middle;">
+							<a href="download/readme">README</a>
+						</td>
+					</tr>
+
+					<tr>
+						<td>Genes with Temporal-specific Expression Patterns</td>
+						<td>2023-12-3</td>
+						<td>1.0</td>
+						<td>137 MB</td>
+						<td>CSV</td>
+						<td><a href="download/cluster_gene_download">Download</a></td>
+						<!-- <td>-</td> -->
+
+					</tr>
+					<tr>
+						<td>Model Fitting Results Dataset</td>
+						<td>2023-12-3</td>
+						<td>1.0</td>
+						<td>1.44 MB</td>
+						<td>CSV</td>
+						<td><a href="download/model_info_download">Download</a></td>
+					</tr>
+					<tr>
+						<td>Gene Expression Profiles of All Datasets</td>
+						<td>2023-12-3</td>
+						<td>1.0</td>
+						<td>3.41 GB</td>
+						<td>ZIP</td>
+						<td><a href="download/Expression_download">Download</a></td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- 	<h5> Intruduction of the data</h5>
+			<blockquote class="blockquote">
+				<p> This is a structured data. It also has a dose label, which can be directly used for deep learning, big data
+					analysis, etc.</p>
+
+			</blockquote> -->
+<!-- 			<br />
+			<h5>Reference</h5>
+			<blockquote class="blockquote">
+				<footer class="blockquote-footer"><b><a href="https://go.drugbank.com/">DRUGBANK</a></b>
+					: A knowledgebase for drugs, drug actions and drug targets.
+
+				</footer>
+				<footer class="blockquote-footer"><b><a href="http://www.t3db.ca/">T3DB</a></b>
+					: The toxic exposome database.
+				</footer>
+				<footer class="blockquote-footer"><b><a href="https://www.atsdr.cdc.gov/">ATSDR</a></b>
+					: The Agency for Toxic Substances and Disease Registry.
+				</footer>
+				<footer class="blockquote-footer"><b><a href="https://www.pdr.net/">PDR</a></b>
+					: The Prescriber's Digital Reference.
+				</footer>
+				<footer class="blockquote-footer"><b><i>The Pharmacological Basis of Therapeutics</i></b>
+					: A textbook of pharmacology originally authored by Louis S. Goodman and Alfred Gilman.
+					<sup><a style="font-size: 1px;" href='https://en.wikipedia.org/wiki/Goodman_%26_Gilman%27s_The_Pharmacological_Basis_of_Therapeutics'>Wiki</a></sup>
+				</footer>
+				<footer class="blockquote-footer"><b><i>Human Intravenous Pharmacokinetic Dataset</i></b>
+				: doi: 10.1124/dmd.118.082966. Epub 2018 Aug 16. <b><a href="https://pubmed.ncbi.nlm.nih.gov/30115648/">PMID: 30115648</a></b>.
+				</footer> -->
+				<!-- <footer class="blockquote-footer">Lombardo F, Berellini G, Obach RS. Trend Analysis of a Database of Intravenous
+					Pharmacokinetic Parameters in Humans for 1352 Drug Compounds. Drug Metab Dispos. 2018 Nov;46(11):1466-1477. doi:
+					10.1124/dmd.118.082966. Epub 2018 Aug 16. <b><a href="https://pubmed.ncbi.nlm.nih.gov/30115648/">PMID: 30115648</a></b>.
+				</footer> -->
+
+			<!-- </blockquote> -->
+
+		</div>
+		<br />
+		<br />
+		<br />
+		<div class="lalala"></div>
+		<!-- 底部 -->
+		{% include 'public_templates/footer.html' %}
+
+		<script>
+			$(document).ready(function() {
+				window_width = document.body.clientWidth
+				console.log(window_width)
+				if (window_width < 766) {
+					console.log('aaa');
+					$("#newline").append("</tr><tr>");
+				}
+			})
+		</script>
+	</body>
+</html>

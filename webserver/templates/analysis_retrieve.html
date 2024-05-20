@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>ANALYSIS</title>
+		<script src="/timecourse_app_static/cdn/js/ionic.bundle.min.js"></script>
+		<script src="/timecourse_app_static/cdn/js/plotly-2.8.3.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="/timecourse_app_static/cdn/css/jquery.dataTables.css">
+		<!-- jQuery -->
+		<script type="text/javascript" charset="utf8" src="/timecourse_app_static/cdn/js/jquery-1.10.2.min.js"></script>
+		<!-- DataTables -->
+		<script type="text/javascript" charset="utf8" src="/timecourse_app_static/cdn/js/jquery.dataTables.js"></script>
+		<script type="text/javascript" charset="utf8" src="/timecourse_app_static/cdn/js/dataTables.buttons.min.js"></script>
+		<script type="text/javascript" charset="utf8" src="/timecourse_app_static/cdn/js/buttons.html5.min.js"></script>
+		
+		
+		
+		
+		{% include 'public_templates/bootstrap.html' %}
+		<style type="text/css">
+
+            #app .el-card__header {
+                background-color: rgba(0,0,0,.03);
+            }
+
+            #app .el-timeline {
+                padding-right: 40px;
+            }
+
+		</style>
+        <link rel="stylesheet" href="/timecourse_app_static/cdn/css/index.css">
+        <script src="/timecourse_app_static/cdn/js/vue.min.js"></script>
+        <script src="/timecourse_app_static/cdn/js/index.js"></script>
+        <script src="/timecourse_app_static/cdn/js/axios.min.js"></script>
+        <script src="/timecourse_app_static/cdn/js/en.js"></script>
+
+
+    </head>
+	<body>
+		<!-- 导航栏 -->
+		{% include 'public_templates/nav_tem.html' %}
+
+
+		<!-- 主体 -->
+		<div id="app" class="container  border rounded-5"  style="min-height: calc(100vh - 180px); margin: 1em auto; border-radius: .5rem; box-shadow: 1px 1px 5px grey;">
+			<!-- <br>
+			<p style="font-size: 22px;">  The online service facilitates the prediction of expression trends for individual genes and transcriptomic data.
+			This service currently exclusively accommodates input consisting of expression profile data and temporal sequence 
+			information (data failing to meet the input criteria cannot be analyzed or displayed).</p>
+			 -->
+            <template>
+                <el-tabs v-model="activeTab" >
+                    <el-tab-pane label="Retrieve" name="RetrieveTab">
+                        <div class="container">
+                            <h2><span style="color: #1d5899;">Check your results</span></h2>
+                            <hr style="margin-top: 0;">
+                            <div class="row" style="margin-bottom: 300px;">
+                                <div class="col-md-12" style="font-size: 18px;">
+									<br>
+                                    <p>Note: Each job result is saved for 30 days on our server. After that, result files will be deleted and you may need to re-run your analyses. Please download and save your files in time.</p>
+                                    <br>
+                                    <h4><span style="color: #1d5899;">Please input the job identifier:</span></h4>
+                                    <div style="display: flex; justify-content: space-around" class="col-md-8">
+                                        <el-input clearable="true"   v-model="retrieveId" placeholder="Input job identifier here">
+                                        </el-input>
+                                        <el-button style="margin-left: 20px;" type="primary" @click="submitRetrieve">Retrieve</el-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </el-tab-pane>
+                    <el-tab-pane  label="Result" :disabled="resultTabDisabled" name="resultTab">
+                        <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; padding-right: 10px;">
+                            <div>
+                                <span style="font-weight: 700; padding-right: 10px;">Analysis Id:</span> <el-tag type="success"><span v-text="resultTabData.analysis_id"></span></el-tag>
+                                <span style="font-weight: 700; margin-left: 10px; padding-right: 10px;">Analysis Type:</span> <el-tag type="success"><span v-text="resultTabData.analysisType"></span></el-tag>
+                            </div>
+                            <el-link :href="downloadLink" class="btn btn-primary" target="_blank" style="text-decoration: none; color: white;background: rgb(23, 162, 184); padding: 8px 20px;">Download</el-link>
+                        </div>
+                        <el-tabs tab-position="left"  stretch="true" style="">
+                            <el-tab-pane v-if="!contantDFShow" label="Model Fit Indicators Table">
+								<br>
+								<p>Note: Evaluations including CV, R^2, adjusted R^2, minimum Root Mean Square Error (RMSE) and minimum Akaike
+								Information Criterion (AlC) values of all 8 types of models.</p>
+                                <el-table
+                                        header-cell-style="background-color: rgb(23, 162, 184); color: #fff;"
+                                        style="width: 100%"
+                                        :data="pagingTable1">
+                                    <el-table-column
+                                            prop="model"
+                                            label="Model"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="rmse"
+                                            label="RMSE"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="rsq"
+                                            label="R^2"
+                                    >
+                                    </el-table-column>
+									<el-table-column
+									        prop="adjrsq"
+									        label="adj.R^2"
+									        >
+									</el-table-column>
+                                    <el-table-column
+                                            prop="aicc"
+                                            label="AIC"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="cluster"
+                                            v-if="!singleGeneShow"
+                                            label="Cluster"
+                                    >
+                                    </el-table-column>
+                                </el-table>
+                                <br>
+                                <p>Note: Equations and parameters will be output only for fitted models meeting the criteria.</p>
+                                <el-table
+                                        header-cell-style="background-color: rgb(23, 162, 184); color: #fff;"
+                                        style="width: 100%"
+                                        :data="resultTabData.ModelDF_df">
+                                    <el-table-column
+                                            v-if="!singleGeneShow"
+                                            prop="cluster"
+                                            key="cluster"
+                                            label="Cluster"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="model"
+                                            label="Model"
+                                            width="100"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="parameters"
+                                            label="Parameters"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="exp"
+                                            label="ModelFormula"
+                                    >
+                                    </el-table-column>
+
+                                </el-table>
+                                <div class="block">
+                                    <el-pagination
+                                            @size-change="changeTable1"
+                                            @current-change="changeTable1"
+                                            :current-page.sync="pageNo"
+                                            :page-sizes="[8, 16, 24, 32, 40, 50, 100]"
+                                            :page-size.sync="pageSize"
+                                            layout="total, sizes, prev, pager, next, jumper"
+                                            :total="table1Total">
+                                    </el-pagination>
+                                </div>
+                            </el-tab-pane>
+
+                            <el-tab-pane v-if="contantDFShow" label="ConstantDF Table">
+                                <el-table
+                                        header-cell-style="background-color: rgb(23, 162, 184); color: #fff;"
+                                        style="width: 100%"
+                                        :data="resultTabData.ConstantDF_result">
+                                    <el-table-column
+                                            prop="model"
+                                            label="Model"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="rmse"
+                                            label="RMSE"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="rsq"
+                                            label="R^2"
+                                    >
+                                    </el-table-column>
+									<el-table-column
+									        prop="adjrsq"
+									        label="adj.R^2"
+									        >
+									</el-table-column>
+                                    <el-table-column
+                                            prop="aicc"
+                                            label="AIC"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            v-if="!singleGeneShow"
+                                            prop="cluster"
+                                            key="cluster"
+                                            label="Cluster"
+                                    >
+                                    </el-table-column>
+                                </el-table>
+                            </el-tab-pane>
+                            <el-tab-pane label="Time Series Trend Chart">
+                                <div>
+                                    <div v-show="!singleGeneShow" style="margin-bottom: 10px;">
+                                        <span>Cluster: </span>
+                                        <el-select v-model="resultTabData.selectedCluster" @change="changeCluster" placeholder="Please select">
+                                            <el-option
+                                                    v-for="(item,index) in resultTabData.cluster_model_list"
+                                                    :key="index"
+                                                    :label="item"
+                                                    :value="item">
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                    <div v-show="singleGeneShow" style="margin-bottom: 10px;">
+                                        <span>Model: </span>
+                                        <el-select v-model="resultTabData.selectedCluster" @change="changeCluster" placeholder="Please select">
+                                            <el-option
+                                                    v-for="(item,index) in resultTabData.model_list"
+                                                    :key="index"
+                                                    :label="item"
+                                                    :value="item">
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+
+                                    <div v-show="!singleGeneShow" style="width: 100%;" id="heatmap"></div>
+                                    <div style="width: 100%;" id="line-chart"></div>
+                                </div>
+                            </el-tab-pane>
+                        </el-tabs>
+
+                    </el-tab-pane>
+
+                </el-tabs>
+            </template>
+
+        </div>
+
+        <script>
+            ELEMENT.locale({
+                el: {
+                    colorpicker: {
+                        confirm: 'OK',
+                        clear: 'Clear'
+                    },
+                    datepicker: {
+                        now: 'Now',
+                        today: 'Today',
+                        cancel: 'Cancel',
+                        clear: 'Clear',
+                        confirm: 'OK',
+                        selectDate: 'Select date',
+                        selectTime: 'Select time',
+                        startDate: 'Start Date',
+                        startTime: 'Start Time',
+                        endDate: 'End Date',
+                        endTime: 'End Time',
+                        prevYear: 'Previous Year',
+                        nextYear: 'Next Year',
+                        prevMonth: 'Previous Month',
+                        nextMonth: 'Next Month',
+                        year: '',
+                        month1: 'January',
+                        month2: 'February',
+                        month3: 'March',
+                        month4: 'April',
+                        month5: 'May',
+                        month6: 'June',
+                        month7: 'July',
+                        month8: 'August',
+                        month9: 'September',
+                        month10: 'October',
+                        month11: 'November',
+                        month12: 'December',
+                        week: 'week',
+                        weeks: {
+                            sun: 'Sun',
+                            mon: 'Mon',
+                            tue: 'Tue',
+                            wed: 'Wed',
+                            thu: 'Thu',
+                            fri: 'Fri',
+                            sat: 'Sat'
+                        },
+                        months: {
+                            jan: 'Jan',
+                            feb: 'Feb',
+                            mar: 'Mar',
+                            apr: 'Apr',
+                            may: 'May',
+                            jun: 'Jun',
+                            jul: 'Jul',
+                            aug: 'Aug',
+                            sep: 'Sep',
+                            oct: 'Oct',
+                            nov: 'Nov',
+                            dec: 'Dec'
+                        }
+                    },
+                    select: {
+                        loading: 'Loading',
+                        noMatch: 'No matching data',
+                        noData: 'No data',
+                        placeholder: 'Select'
+                    },
+                    cascader: {
+                        noMatch: 'No matching data',
+                        loading: 'Loading',
+                        placeholder: 'Select',
+                        noData: 'No data'
+                    },
+                    pagination: {
+                        goto: 'Go to',
+                        pagesize: '/page',
+                        total: 'Total {total}',
+                        pageClassifier: ''
+                    },
+                    messagebox: {
+                        title: 'Message',
+                        confirm: 'OK',
+                        cancel: 'Cancel',
+                        error: 'Illegal input'
+                    },
+                    upload: {
+                        deleteTip: 'press delete to remove',
+                        delete: 'Delete',
+                        preview: 'Preview',
+                        continue: 'Continue'
+                    },
+                    table: {
+                        emptyText: 'No Data',
+                        confirmFilter: 'Confirm',
+                        resetFilter: 'Reset',
+                        clearFilter: 'All',
+                        sumText: 'Sum'
+                    },
+                    tree: {
+                        emptyText: 'No Data'
+                    },
+                    transfer: {
+                        noMatch: 'No matching data',
+                        noData: 'No data',
+                        titles: ['List 1', 'List 2'], // to be translated
+                        filterPlaceholder: 'Enter keyword', // to be translated
+                        noCheckedFormat: '{total} items', // to be translated
+                        hasCheckedFormat: '{checked}/{total} checked' // to be translated
+                    },
+                    image: {
+                        error: 'FAILED'
+                    },
+                    pageHeader: {
+                        title: 'Back' // to be translated
+                    },
+                    popconfirm: {
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'No'
+                    },
+                    empty: {
+                        description: 'No Data'
+                    }
+                }
+            });
+            new Vue({
+                el: "#app",
+                data: {
+                    activeTab: "RetrieveTab",
+                    retrieveId: "",
+                    exampleData: {
+                        example1: "genesymbol	1.912267666	1.4433000701	0.869821347	0.564356829	0.524113953",
+                        example2: "1	2	3	4	5",
+                    },
+                    timeSeriesTextOpen: true,
+                    timeSeriesText: "",
+                    timeSeriesFile: null,
+                    timeInfoTextOpen: true,
+                    timeInfoText: "",
+                    timeInfoFile: null,
+                    pagingTable1: [],
+                    pageSize: 8,
+                    pageNo: 1,
+                    resultTabData: {
+                        selectedCluster: '0',
+                        plot_data: {},
+                        analysisType: '',
+                        heatmap_data: [],
+                        model_list: [],
+                        cluster_model_list:[],
+                        trend_data: [],
+                        ConstantDF_result: [],
+                        EvaIndicator_df: [],
+                        ModelDF_df: []
+                    }
+                },
+                computed: {
+                    singleGeneShow() {
+                        return this.resultTabData.analysisType === 'singleGene';
+                    },
+                  contantDFShow: function () {
+                      return this.resultTabData.ConstantDF_result && this.resultTabData.ConstantDF_result.length > 0
+                  },
+                table1Total() {
+                    return  this.resultTabData.EvaIndicator_df.length;
+                },
+                changeTable1() {
+                    let offset = (this.pageNo - 1) * this.pageSize;
+                    let array = this.resultTabData.EvaIndicator_df;
+                    this.pagingTable1 = (offset + this.pageSize >= array.length) ? array.slice(offset, array.length) : array.slice(offset, offset + this.pageSize);
+                },
+                  downloadLink: function () {
+                      return '/GeTeSEPdb/download_result?analysisId=' + this.resultTabData.analysis_id
+                  },
+                    resultTabDisabled: function () {
+                      return  this.resultTabData.analysis_id === undefined || this.resultTabData.analysis_id === ''
+                    }
+                },
+                methods: {
+                    hanldeTab(tab, event) {
+
+                    },
+                    resetForm() {
+                        this.timeSeriesText = '';
+                        this.timeInfoText = '';
+                        this.timeInfoTextOpen = true;
+                        this.timeSeriesTextOpen = true;
+                    },
+                    clickExample1() {
+                        this.timeSeriesText = this.exampleData.example1
+                    },
+                    clickExample2() {
+                        this.timeInfoText = this.exampleData.example2
+                    },
+                    beforeUpload1(file, fileList) {
+                        this.timeSeriesFile = fileList;
+                    },
+                    beforeUpload2(file, fileList) {
+                        this.timeInfoFile = fileList;
+                    },
+                    // 获取cookie
+                    getCookie(cname) {
+                        var name = cname + "=";
+                        var ca = document.cookie.split(';');
+                        for(var i=0; i<ca.length; i++)
+                        {
+                            var c = ca[i].trim();
+                            if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+                        }
+                        return "";
+                    },
+                    submitRetrieve() {
+                      this.submitForm(this.retrieveId);
+                    },
+                    changeCluster(val) {
+                        this.resultTabData.selectedCluster = val;
+                        console.log('selectCluster:' +this.resultTabData.selectedCluster);
+                        this.$forceUpdate();
+                        if (this.resultTabData.analysisType === 'singleGene') {
+                            this.updateSingleGeneChart();
+                        }
+                        if (this.resultTabData.analysisType === 'omicData') {
+                            this.omicChartUpdate();
+                        }
+
+                    },
+                    omicChartUpdate() {
+                        let that = this;
+                        var selectedCluster = that.resultTabData.selectedCluster;
+                        let plot_data = that.resultTabData.plot_data
+                        var trend_data = plot_data.trend_data;
+                    	var tread_data_line = plot_data.tread_data_line;
+                        var heatmap_data = plot_data.heatmap_data;
+                    	var x_Axis = that.resultTabData.x_Axis
+                    
+                        var heatmapTrace = {
+                            type: 'heatmap',
+                            x: x_Axis,
+                            y: (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : heatmap_data[selectedCluster].y,
+                            z: (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : heatmap_data[selectedCluster].z,
+                            colorscale: [['0.0', 'rgb(94,79,162)'], ['0.1', 'rgb(50,136,189)'], ['0.2', 'rgb(102,194,165)'], ['0.3', 'rgb(171,221,164)'], ['0.4', 'rgb(230,245,152)'], ['0.5', 'rgb(255,255,191)'], ['0.6', 'rgb(254,224,139)'], ['0.7', 'rgb(253,174,97)'], ['0.8', 'rgb(244,109,67)'], ['0.9', 'rgb(213,62,79)'], ['1.0', 'rgb(158,1,66)']],
+                            showscale: true,
+                            colorbar: { title: 'Z-Score' },
+                        };
+                    
+                        var heatmapLayout = {
+                            title: 'Heatmap',
+                            bargap: 0.1,
+                            legend: {
+                                font: { color: '#666666' },
+                                bgcolor: '#FFFFFF',
+                                title: { text: 'z-Score' }
+                            },
+                            xaxis: {
+                                title: 'Time Serie',
+                                showgrid: true,
+                                tickfont: { color: '#666666' },
+                                gridcolor: '#F6F6F6',
+                                titlefont: { color: '#666666' },
+                                zerolinecolor: '#F6F6F6'
+                            },
+                            yaxis: {
+                                title: 'Gene Expression Value',
+                                showgrid: true,
+                                tickfont: { color: '#666666' },
+                                gridcolor: '#F6F6F6',
+                                titlefont: { color: '#666666' },
+                                zerolinecolor: '#F6F6F6',
+                                showticklabels: false,
+                                ticks: ''
+                            },
+                            titlefont: { color: '#151516' },
+                            plot_bgcolor: '#E5E5E5',
+                            paper_bgcolor: '#FFFFFF'
+                        };
+                    
+                    
+                        Plotly.newPlot('heatmap', [heatmapTrace], heatmapLayout);
+                    
+                        // Update line chart
+                        var time =  (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : trend_data[selectedCluster].x;
+                        var geneData = (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : trend_data[selectedCluster].y;
+                    	var newx =  (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : tread_data_line[selectedCluster].x;
+                    	var newy = (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : tread_data_line[selectedCluster].y;
+                    	
+                        console.log('geneData:' + JSON.stringify(geneData))
+                        var traceData = [];
+                        for (var gene in geneData) {
+                            var trace = {
+                                x: x_Axis,
+                                y: geneData[gene],
+                                name: gene,
+                                type: 'scatter'
+                            };
+                            traceData.push(trace);
+                        }
+                    	var newTrace = {
+                    		x: newx,
+                    		y: newy,
+                    		mode: 'lines',
+                    		name: 'fitting line',
+							line: {
+									color: 'black', // 设置线条颜色为黑色
+                                    width: 4
+								}
+                    	};
+                    	traceData.push(newTrace);
+                    
+                        var lineChartLayout = {
+                            title: 'Time Series Trend Chart',
+                            xaxis: {
+                                title: 'Time Series'
+                            },
+                            yaxis: {
+                                title: 'Gene Expression Value'
+                            }
+                        };
+                    
+                        Plotly.newPlot('line-chart', traceData, lineChartLayout);
+                    },
+                    updateSingleGeneChart() {
+						let that = this;
+						var selectedCluster = that.resultTabData.selectedCluster;
+						let plot_data = that.resultTabData.plot_data
+						var trend_data = plot_data.trend_data;
+						var tread_data_line = plot_data.tread_data_line;
+						console.log('tread_data_line:' + JSON.stringify(tread_data_line))
+						
+						var x_Axis = plot_data.x_Axis;
+						var time =  (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : trend_data[selectedCluster].x;
+						var geneData = (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : trend_data[selectedCluster].y;
+						var gene = (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : trend_data[selectedCluster].z;
+						var newx =  (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : tread_data_line[selectedCluster].x;
+						var newy = (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : tread_data_line[selectedCluster].y;
+						console.log('geneData:' + JSON.stringify(geneData))
+						
+						var traceData = [];
+						var trace1 = {
+							  x: x_Axis,
+							  y: geneData,
+							  name: "expression value",
+							  mode: 'markers'
+						};
+						var trace2 = {
+                            x: newx,
+                            y: newy,
+                            mode: 'lines',
+                            name: 'predicted value'
+                        };
+
+						traceData.push(trace1, trace2);
+						
+						
+						var lineChartLayout = {
+							  title: gene + ' trend chart',
+							  xaxis: {
+								  title: 'Time Series'
+							  },
+							  yaxis: {
+								  title: 'Gene Expression Value'
+							  }
+						};
+						
+						Plotly.newPlot('line-chart', traceData, lineChartLayout);
+       //                  let that = this
+       //                  let plot_data = that.resultTabData.plot_data
+       //                  var trend_data = plot_data.trend_data;
+       //                  var tread_data_line = plot_data.tread_data_line;
+       //                  console.log('tread_data_line:' + JSON.stringify(tread_data_line))
+
+       //                  var x_Axis = plot_data.x_Axis;
+
+       //                  var time = trend_data.x;
+       //                  var geneData = trend_data.y;
+       //                  var gene = trend_data.z;
+       //                  var traceData = [];
+       //                  var trace1 = {
+       //                      x: x_Axis,
+       //                      y: geneData,
+       //                      name: gene,
+       //                      mode: 'markers'
+       //                  };
+       //                  var trace2 = {
+       //                      x: tread_data_line.x,
+       //                      y: tread_data_line.y,
+       //                      mode: 'lines',
+       //                      name: gene,
+							// line: {
+							// 		color: 'black' // 设置线条颜色为黑色
+							// 	}
+       //                  };
+       //                  traceData.push(trace1, trace2);
+
+
+       //                  var lineChartLayout = {
+       //                      title: gene + ' trend chart',
+       //                      xaxis: {
+       //                          title: 'Time Series'
+       //                      },
+       //                      yaxis: {
+       //                          title: 'Gene Expression Value'
+       //                      }
+       //                  };
+
+       //                  Plotly.newPlot('line-chart', traceData, lineChartLayout);
+                    },
+                    submitForm(analysisResultId) {
+                        oldAnalysisId = this.resultTabData.analysis_id
+                        this.resultTabData.analysis_id = '';
+                        let that = this;
+                        const formData = new FormData();
+                        formData.append("analysisResultId", analysisResultId);
+                        const service = axios.create({
+                            baseURL: '',
+                            timeout: 20000,
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': this.getCookie("csrftoken")
+                            }
+                        })
+                        service.post('/GeTeSEPdb/analysis/retrieve_result', formData)
+                            .then(function (res) {
+                                let resData = res.data
+                                {#console.log('Back end return:' + JSON.stringify(resData));#}
+                                if (resData.status === 1) {
+                                    // 运行成功
+                                    let returnData = resData.data;
+                                    that.activeTab = 'resultTab';
+                                    // 结果赋值给resultTabData去画图渲染
+                                    that.resultTabData = returnData
+                                    let analysisType = that.resultTabData.analysisType
+                                    if (analysisType === 'singleGene') {
+										let model_list = that.resultTabData.model_list;
+										if (model_list && model_list.length > 0) {
+										    that.resultTabData.selectedCluster = model_list[0];
+										}
+                                        that.updateSingleGeneChart();
+                                    } else if (analysisType === 'omicData') {
+
+                                        let cluster_list = that.resultTabData.cluster_model_list;
+                                        if (cluster_list && cluster_list.length > 0) {
+                                            that.resultTabData.selectedCluster = cluster_list[0];
+                                        }
+                                        that.omicChartUpdate();
+                                    }
+                                    that.$forceupdate();
+                                } else {
+                                    that.$message.error('Run failed,Analyze ID:' + resData.data.analysis_id);
+                                }
+
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+                }
+            });
+        </script>
+
+        <!-- 底部 -->
+				{% include 'public_templates/footer.html' %}
+    </body>
+
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html><!--search.html-->
+<head>
+    <title>Home</title>
+	<meta charset="utf-8">
+	{% include 'public_templates/bootstrap.html' %}
+	
+	<style>
+		#demo{
+			max-width: 100%;
+			max-height: 100%;
+		}
+		.carousel-caption{
+			color: #000000;
+		}
+		#version_table tbody tr td{
+			font-size: 17px;
+			text-align: center;
+		}
+		#version_table thead th{
+			font-size: 17px;
+		}
+		.card-body .row{
+			line-height: 40px;
+		}
+		.card-body .row img{
+			padding: 0 10px 0 10px;
+		}
+		#data_statistic_table tbody th{
+			font-weight: normal;
+			
+		}
+		
+		td, th {
+		    padding: 8px;
+		    text-align: center;
+		  }
+		
+		  /* Alternate background colors for table rows */
+		  tr:nth-child(even) {
+		    background-color: #f2f2f2;
+		  }
+		
+		  /* Add borders to the table cells and header */
+		  table {
+		    border-collapse: collapse;
+		    width: 100%;
+		  }
+		
+		  th, td {
+		    border: 1px solid #ababab;
+		  }
+		
+		  /* Center align the text in table header */
+		  th {
+		    vertical-align: middle;
+		  }
+			#statistic {
+		      border-collapse: collapse;
+		      border-spacing: 0;
+		    }
+			#statistic th,
+			#statistic td {
+			  padding: 8px;
+			}
+		
+		  /* Adjust the height of the header row */
+		  .header-row th {
+		    height: 60px;
+		  }
+		
+		  /* Adjust the vertical alignment of numbers in second and third columns */
+		  td:nth-child(2),
+		  td:nth-child(3) {
+		    vertical-align: top;
+		  }
+		
+		  td:nth-child(3) {
+		    vertical-align: middle;
+		  }
+		
+		  /* Adjust the height of the header row */
+		  .header-row th {
+		    height: 60px;
+		  }
+		#slideshow .card{
+			border: 1px dashed #ababab;
+			padding-top: 20px;
+		}
+		/* 最下面 数据统计部分*/
+		#total_data_static .row{
+			line-height: 1.0;
+		}
+		#data_statistic_table tbody tr td{
+			/* line-height: 5px; */
+			padding: 2px 0 2px 10px;
+			/* height: 15px; */
+		
+		}
+		#total_data_static .row img{
+			padding-bottom: 15px;
+		}
+		/* 轮播图字体 */
+		#slideshow .card-title{
+			font-size: 17px;
+		}
+		/* static-table的border */
+		.table-bordered td, .table-bordered th{
+			border: 1px solid #c7c7c7;
+		}
+		/* 右箭头标记 */
+		.mark-symbol{
+			color: #6495ED;font-size: 25px;padding-left: 1rem;font-weight: lighter;
+		}
+		
+		#statistic tbody tr td:first-child{
+			text-align: left;
+			padding-top: 0;
+			padding-bottom: 0;
+			margin-bottom: 0;
+		}
+		#statistic {
+			margin-bottom: 0;
+		}
+		#statistic_td {
+			padding: 10px;
+		}
+		#statistic tbody tr td:nth-child(2){
+			text-align: right;
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+		#statistic tbody tr:nth-child(1){
+			border-bottom: 1px solid #ababab;
+		}
+	</style>
+	<script>
+		$(document).ready(function() {
+			$("#nav_home").addClass("active");
+			$("#page_title").text('HOME');
+			$("#datasetsearchdemo").hide()
+			console.log($("input[name='csrfmiddlewaretoken']").attr('value'))
+		});
+		
+		function test(data) {
+			console.log(data.innerHTML)
+			post_data = data.innerHTML
+			$('#query_content').val(post_data);
+		}
+	</script>
+</head>
+<body>
+		<!-- 导航栏 -->
+		{% include 'public_templates/nav_tem.html' %}
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-sm-2 mb-4"></div>
+				<div class="col-lg-6 col-sm-8 mb-4" style="margin-bottom: 0px;">
+					<div class="row" >
+						<!-- <img style="width: 23%;height: 23%;margin-top: 2rem;margin-left: 50px;" src="/pertorg_static/img/pertorg_logo3.png"/> -->
+						<div class="col" style="padding-left: 0px;">
+							<h1 class="text-center" style="margin-top: 2rem;color: #17a2b8;font-size: 90px;margin-bottom: 0rem;">GeTeSEPdb</h1>
+							<p style="margin: 0 120px 0rem 0;color: darkgray;text-align: right;">Version: 1.0</p>
+						</div>
+						
+					</div>
+					
+					<!-- <h6 class="text-center blockquote-footer" style="color: #17a2b8;;font-size: 20px;">
+						
+					</h6> -->
+					<!-- <p style="margin: 0 60px 0rem 0;color: darkgray;text-align: right;">Version: 1.0</p> -->
+				</div>
+				<div class="col-lg-3 col-sm-2 mb-4"></div>
+			</div>
+			
+			<div class="row">
+				<div class="col-lg-2 col-sm-0 mb-1"></div>
+				<div class="col-lg-8 col-sm-12 mb-10">
+					<!--搜索表单-->
+					<div style="text-align: center">
+						<form id='home_search' style="display: inline-block; margin: auto" class="form-inline" action="/GeTeSEPdb/result"
+						 method="get">
+						 {% csrf_token %}
+							<div class="row" style="padding-left: 20px;">
+								<div class="form-check">
+									<label class="form-check-label" for="gene_search">
+										<input type="radio" id='gene_search' value="gene_search" name="search_method" checked>
+										&nbsp;Gene search&nbsp;
+									</label>
+								</div>
+								&nbsp;&nbsp;&nbsp;
+								<div class="form-check">
+									<label class="form-check-label" for="dataset_search">
+										<input type="radio" id='dataset_search' value="dataset_search" name="search_method">
+										&nbsp;Dataset search&nbsp;
+									</label>
+											
+								</div>
+							</div>
+							
+							<input id="query_content" class="form-control" style="min-width: 570px;margin-top: 0px;" type="search" placeholder=""
+							 name='query_content' aria-label="Search">
+							<button class="btn btn-info" style="margin-left: 5px;margin-top: 0px;" type="submit">Quick Search</button>
+							<!-- <p>Enter an official gene symbol, e.g. (<a href="#" onclick="test(this)">A1BG</a>).</p> -->
+							<div id="genesearchdemo">
+								<p>Enter an official gene symbol, e.g. (<a href="#" onclick="test(this)">A1BG</a>).</p>
+							</div>
+							<div id="datasetsearchdemo">
+								<p>Enter a keyword of dataset, e.g. experiment type (<a href="#" onclick="test(this)">Differentiation or development</a>),<br />
+								drug name (<a href="#" onclick="test(this)">4-thiouracil</a>), tissue (<a href="#" onclick="test(this)">head</a>), 
+								or GEO accession (<a href="#" onclick="test(this)">GSE123165</a>).</p>
+							</div>
+						</form>
+						<br />
+						<br />
+
+						
+						<!-- <img src="/pertorg_static/study_detail/Pertg00023/pics/GSEA/cel00010.png" /> -->
+					</div>
+				</div>
+				<div class="col-lg-2 col-sm-0 mb-1"></div>
+			</div>
+		</div>
+		
+		
+		<div class="container col-8">
+		
+			<!-- 文字加轮播图 -->
+			<div class="card col-12" style="border: none;">
+				<div class="row no-gutters">
+					<div class="col-md-12">
+						<div class="card-body" style="">
+							<!-- 网站介绍 -->
+							<h4 style="margin: 0 0 10px 0;">Welcome to GeTeSEPdb 1.0</h4>
+							<p style="font-size: 23px;margin-bottom: 0;">
+								A database of gene profiles with temporal-specific expression patterns.
+							</p>
+						</div>
+					</div>
+				</div>
+				<!-- 第二排 -->
+				<div class="row no-gutters" style="display: flex;  ">
+					<div class="card-body" style="flex: 1; width: 50%; display: flex; flex-direction: column;">
+						<!-- what -->
+						<nav class="navbar navbar-dark text-white bg-info" style="flex-grow: 0;border-radius: 10px 10px 0px 0px;font-weight: bolder;">
+							What is GeTeSEPdb?
+						</nav>
+						<div class="card " style="flex-grow: 1;border-radius: unset;border: 1px solid #ababab;">
+							<div class="card-header" style="border-radius: 10px 10px 0px 0px;font-weight: bolder;">Resource  Overview</div>
+							<div class="card-body" style="padding: 0px;">
+								<!-- <h5 class="card-title">Secondary card title</h5> -->
+								<p class="card-text" style="padding: 10px;">Gene profiles with temporal-specific expression patterns were defined as those whose expression
+								has a specific pattern with respect to time. Using a high-throughput regression analysis approach, eight 
+								linear and nonlinear parametric models (linear, constant, logistic, logarithmic, exponential, power, trigonometric, 
+								quadratic functions) were fitted to gene expression profiles from time-series experiments to identify eight types 
+								of gene profiles with temporal-specific expression patterns.
+								<br />
+								<br />
+								In GeTeSEPdb, we manually collected and curated raw data from 2684 time-series transcriptomic datasets 
+								in the Gene Expression Omnibus (GEO) and ArrayExpress repositories. These datasets were derived from 
+								well-conducted time course studies (that had at least five time points) involving humans and various 
+								other organisms. We utilized Clust to cluster subsets of genes and performed regression analysis to identify 
+								patterns.As a result, we identified and deposited 2,644,370 gene profiles with temporal-specific expression
+								patterns in GeTeSEPdb.
+								</p>
+							</div>
+						</div>
+						<!-- <nav class="navbar navbar-dark text-white bg-info" style="border-radius: 10px 10px 0px 0px;font-weight: bolder;">
+							Features of GeTeSEPdb 1.0
+						</nav> -->
+						<div style="display: flex; width: 100%; ">
+							<div class="card" style="flex: 1;  box-sizing: border-box;border-radius: unset;border: 1px solid #ababab; ">
+								<div class="card-header" style="border-radius: 10px 10px 0px 0px;font-weight: bolder;">Resource Features</div>
+								<div class="card-body" style="padding: 0px;">
+									<!-- <h5 class="card-title">Secondary card title</h5> -->
+									<div class="card-body" style="padding: 1.25rem;">
+									<!-- <div class="row"> -->
+										<p class="card-text">
+											<span class="mark-symbol">></span>
+											<strong>Numerous time series datasets</strong> covering a wide range of organisms were acquired.</p>
+									<!-- </div> -->
+									<!-- <div class="row"> -->
+										<p class="card-text">
+											<span class="mark-symbol">></span>
+											Gene profiles that displays <strong>8 types of temporally specific expression patterns</strong> were identified.</p>
+									<!-- </div> -->
+									<!-- <div class="row"> -->
+										<p class="card-text">
+											<span class="mark-symbol">></span>
+											A <strong>web-based tool</strong> has been developed for identifying gene profiles with temporally specific expression patterns.</p>
+									<!-- </div> -->
+									<!-- <div class="row">
+										<p class="card-text">
+											<span class="mark-symbol">></span>
+											Pharmacokinetic/Toxicokinetic/Dosage analysis of a drug set</p>
+									</div>
+									<div class="row">
+										<p class="card-text">
+											<span class="mark-symbol">></span>
+											Drug screening and drug design</p>
+									</div> -->
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+					<div class="card-body" style="flex: 1; width: 50%; display: flex; flex-direction: column;">
+						<!-- what -->
+						<nav class="navbar navbar-dark text-white bg-info" style="flex-grow: 0;border-radius: 10px 10px 0px 0px;font-weight: bolder;">
+							Statistics
+						</nav>
+						<div class="card " style="flex-grow: 1;border-radius: unset;border: 1px solid #ababab; display: flex; flex-direction: column; margin-bottom: 0;">
+							
+							<!-- <div class="card-body"> -->
+								<!-- <h5 class="card-title">Secondary card title</h5> -->
+							<table style="width: 100%; flex-grow: 1; padding: 0; margin: 0;">
+								<tbody>
+									<tr>
+										<td id="statistic_td">
+											<table id="statistic" style="width: 100%;" class="table table-bordered">
+												<thead></thead>
+												<tbody>
+													<col style="width: 34%;" />
+													<col style="width: 33%;" />
+													<col style="width: 33%;" />
+													<tr class="header-row">
+													  <th style="text-align: center; vertical-align: middle;">Organism</th>
+													  <th style="text-align: center; vertical-align: middle;"># Datasets</th>
+													  <th style="text-align: center; vertical-align: middle;"># Gene profiles with temporal patterns</th>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Arabidopsis thaliana</td>
+													    <td style="text-align: center; vertical-align: middle;">183</td>
+														<td>194505</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Caenorhabditis elegans</td>
+													    <td style="text-align: center; vertical-align: middle;">38</td>
+														<td>95668</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Danio rerio</td>
+													    <td style="text-align: center; vertical-align: middle;">23</td>
+														<td>60351</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Drosophila melanogaster</td>
+													    <td style="text-align: center; vertical-align: middle;">53</td>
+														<td>29229</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Escherichia coli</td>
+													    <td style="text-align: center; vertical-align: middle;">18</td>
+														<td>7305</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Mus musculus</td>
+													    <td style="text-align: center; vertical-align: middle;">786</td>
+														<td>901242</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Rattus norvegicus</td>
+													    <td style="text-align: center; vertical-align: middle;">122</td>
+														<td>89125</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Saccharomyces cerevisiae</td>
+													    <td style="text-align: center; vertical-align: middle;">145</td>
+														<td>78004</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Homo sapiens</td>
+													    <td style="text-align: center; vertical-align: middle;">1262</td>
+														<td>1123593</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Bos taurus</td>
+													    <td style="text-align: center; vertical-align: middle;">9</td>
+														<td>4502</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Oryza sativa</td>
+													    <td style="text-align: center; vertical-align: middle;">12</td>
+														<td>36082</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Sus scrofa</td>
+													    <td style="text-align: center; vertical-align: middle;">13</td>
+														<td>8380</td>
+													</tr>
+													<tr>
+													    <td style="text-align: center; vertical-align: middle;">Macaca mulatta</td>
+													    <td style="text-align: center; vertical-align: middle;">20</td>
+														<td>16384</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div style="display: flex; width: 100%; box-sizing: border-box; padding-top: 1.25rem;">
+							<div class="card-body" style="display: flex; flex-direction: column;flex: 1;  padding: 0; box-sizing: border-box;">
+												<nav class="navbar navbar-dark text-white bg-info" style="flex-grow: 0;border-radius: 10px 10px 0px 0px;font-weight: bolder;">
+												News & Updates
+												</nav>
+												<div class="card" style="flex-grow: 1;border-radius: unset;border: 1px solid #ababab; ">
+												<div class="card-body" >
+													<div style="float:left">GeTeSEPdb 1.0 was released.</div>
+													<div style="float:right">[2023-12-3]</div>
+												<table id='news_table'>
+													<tbody>
+													</tbody>
+												</table>
+												</div>
+												</div>
+							</div>
+								
+						</div>
+					</div>
+				
+				</div>
+				
+				
+		
+				
+										
+				<!-- 第三排 -->
+				<div class="col-12 no-gutters">
+				    <nav class="navbar navbar-dark text-white bg-info" style="border-radius: 10px 10px 0px 0px;font-weight: bolder;">
+				        Gene profiles with Temporal-specific Expression Patterns
+				    </nav>
+					<div class="row no-gutters">
+					    <div class="col-3 card-header text-center">Constant Model</div>
+					    <div class="col-3 card-header text-center">Linear Model</div>
+					    <div class="col-3 card-header text-center">Quadratic Model</div>
+						<div class="col-3 card-header text-center">Trigonometric Model</div>
+					</div>
+					<div class="row col-12">
+					    <div class="col-3">
+					        <!-- <p class="card-text">
+					            Explore genes of interest with temporal-specific expression patterns by filtering through various conditions.
+					        </p>
+					        <br> -->
+					        <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/home_model_image/constant.png" alt="constant img">
+					    </div>
+					    <div class="col-3">
+					        <!-- <p class="card-text">
+					            Provide a comprehensive overview of experimental study for all genes exhibiting temporal expression patterns.
+					        </p>
+					        <br> -->
+					        <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/home_model_image/linear.png" alt="linear img">
+					    </div>
+					    <div class="col-3">
+					        <!-- <p class="card-text">
+					            Simultaneously analyze gene expression data and sample time information
+					            data to determine the specific expression pattern of genes.
+					        </p>
+					        <br> -->
+					        <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/home_model_image/quadratic.png" alt="quadratic img">
+					    </div>
+						<div class="col-3">
+						    <!-- <p class="card-text">
+						        Simultaneously analyze gene expression data and sample time information
+						        data to determine the specific expression pattern of genes.
+						    </p>
+						    <br> -->
+						    <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/home_model_image/trigonometric.png" alt="trigonometric img">
+						</div>
+					</div>
+				    <!-- <div class="row no-gutters" style="border: 1px solid #ababab; border-radius: unset; margin-bottom: 1em;">
+				        <div class="col-4">
+				            <div class="row no-gutters">
+				                <div class="col-12 card-header text-center">Advance Search Functions</div>
+				            </div>
+				            <div class="row col-12">
+				                <div class="col-12">
+				                    <p class="card-text">
+				                       Explore genes of interest with temporal-specific expression patterns by filtering through various conditions.
+				                    </p>
+				                    <br>
+				                    <br>
+				                    <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/adv_search1.png" alt="general overview img">
+				                </div>
+				            </div>
+				        </div>
+				        <div class="col-4">
+				            <div class="row no-gutters">
+				                <div class="col-12 card-header text-center">Browse Functions</div>
+				            </div>
+				            <div class="row col-12">
+				                <div class="col-12">
+				                    <p class="card-text">
+				                        Provide a comprehensive overview of experimental study for all genes exhibiting temporal expression patterns.
+				                    </p>
+				                    <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/browse1.png" alt="organoid specificity img">
+				                </div>
+				            </div>
+				        </div>
+				        <div class="col-4">
+				            <div class="row no-gutters">
+				                <div class="col-12 card-header text-center">Analysis Functions</div>
+				            </div>
+				            <div class="row col-12">
+				                <div class="col-12">
+				                    <p class="card-text">
+				                        Simultaneously analyze gene expression data and sample time information 
+										data to determine the specific expression pattern of genes.
+				                    </p>
+				                    <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/analysis.png" alt="organoid specificity img">
+				                </div>
+				            </div>
+				        </div>
+				    </div> -->
+					<br />
+					<br />
+				    <div class="row no-gutters">
+				        <div class="col-3 card-header text-center">Power Model</div>
+				        <div class="col-3 card-header text-center">Logarithmic Model</div>
+				        <div class="col-3 card-header text-center">Exponential Model</div>
+				        <div class="col-3 card-header text-center">Logistic Model</div>
+				    </div>
+				    <div class="row col-12">
+				        <div class="col-3">
+				            <!-- <p class="card-text">
+				                Query single genes for temporal-specific expression patterns.
+				            </p> -->
+				            <!-- <br> -->
+				            <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/home_model_image/power.png" alt="power img">
+				        </div>
+				        <div class="col-3">
+				            <!-- <p class="card-text">
+				                View genes with different temporal-specific expression patterns in each experimental study.
+				            </p> -->
+				            <!-- <br> -->
+				            <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/home_model_image/logarithmic.png" alt="logarithmic img">
+				        </div>
+				        <div class="col-3">
+				            <!-- <p class="card-text">
+				                Obtain classification results of gene expression patterns.
+				            </p> -->
+				            <!-- <br> -->
+				            <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/home_model_image/exponential.png" alt="exponential img">
+				        </div>
+						<div class="col-3">
+						    <!-- <p class="card-text">
+						        Obtain classification results of gene expression patterns.
+						    </p> -->
+						    <!-- <br> -->
+						    <img class="card-img-right" style="width: 100%;" src="/timecourse_app_static/img/home_model_image/logistic1.png" alt="logistic img">
+						</div>
+				    </div>
+				</div>
+				<br />
+				<div class='container col-12' >
+					<div class="database-description">
+						<p><em>To get a better experience with this site, <b>Chrome</b> and <b>Firefox</b> are advised!<em></p>
+						<p><em>This website is free and open to all users and there is no login requirement.<em></p>
+					</div>
+					<div style="display: none;"><script type="text/javascript" src="//rf.revolvermaps.com/0/0/7.js?i=5d0qy4g22hs&amp;m=0&amp;c=ff0000&amp;cr1=ffffff&amp;sx=0" async="async"></script></div>
+						
+						<h6>RELATED RESOURCE:	<b><a target="_blank" href="https://www.ncbi.nlm.nih.gov/geo/">GEO</a> | <a target="_blank" href="https://www.ebi.ac.uk/arrayexpress/">ArrayExpress</a></b></h6>
+				</div>
+			</div>
+		</div>
+		
+		
+		<br />
+		<br />
+		<br />
+		<br />
+		
+		
+
+		<!-- 底栏 -->
+		{% include 'public_templates/footer.html' %}
+		<script>
+		// 	function test(data) {
+		// 		console.log(data.innerHTML)
+		// 		post_data = data.innerHTML
+		// 		$('#query_content').val(post_data);
+		// 		// $('#query_content').submit();
+		// 		// $.ajax({
+		// 		// 	type: 'post',
+		// 		// 	url: '/ddpd/search/home_search',
+		// 		// 	data: $('#home_search').serialize(),
+		// 		// 	dataType: 'json',
+		// 		// 	async: false,
+		// 		// 	success: function(data) {
+		// }
+				$("#dataset_search").click(function (){
+					$("#genesearchdemo").hide();
+					$("#datasetsearchdemo").show();
+				})
+				$("#gene_search").click(function (){
+					$("#genesearchdemo").show();
+					$("#datasetsearchdemo").hide();
+				})
+			
+		</script>
+</body>
+</html>

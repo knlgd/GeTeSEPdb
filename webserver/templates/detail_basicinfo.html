@@ -1,0 +1,159 @@
+<!-- bastc information -->
+<!-- <h3 class="panel-heading" id="list-item-1" style="margin-top: -120px;border-top: 140px solid #f8f9fa;z-index: -1;border-color: rgba(248, 249, 250, 1.0);background-color: #17a2b8;color: #ffffff;">
+	Perturbation information
+</h3> -->
+
+<!-- <style>
+	.dark_anchor {    height: 120px;    margin-top: -120px;}
+</style> -->
+<!-- <script type='text/javascript'>
+	console.log(123)
+	var data={{curr_study| safe}}
+	console.log(typeof(data))
+</script> -->
+
+<!-- <div class="dark_anchor" id="list-item-1"></div> -->
+
+		<h3 class="panel-heading" id="list-item-1" style="margin: 1rem 0 0rem 0 ;background-color: #17a2b8;color: #ffffff;">
+			Basic Information
+		</h3>
+			<div class="container col-12">
+				<div class="row">
+					<div class="col-md-12" style="padding: 0;">
+						<table id="basic_info" class="table table-bordered">									
+							<tbody>
+								<tr>
+									<td class="bg-light">Accession</td>
+									<td colspan="2">
+										<a target="_blank" href="
+											{% if curr_study.data_source == 'GEO' %}
+											https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={{ curr_study.accession }}
+											{% else %}
+											https://www.ebi.ac.uk/arrayexpress/experiments/{{ curr_study.accession }}
+											{% endif %}
+										" style="color: #0000ff;">
+											{{ curr_study.accession }}
+										</a>
+									</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Time</td>
+									<td colspan="2" style="width:100%">{{ curr_study.time }}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Unit</td>
+									<td colspan="2" style="width:100%">{{curr_study.unit}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light"> Time change factor</td>
+									<td colspan="2" style="width:100%">{{curr_study.related_factor}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light"> Experiment type</td>
+									<td colspan="2" style="width:100%">{{curr_study.experiment_type}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Tissue/Cell type</td>
+									<td colspan="2" style="width:100%">{{curr_study.tissue_cell_type}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Drug/Reagent </td>
+									<td colspan="2" style="width:100%">{{curr_study.drug}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Drug or reagent concentration</td>
+									<td colspan="2" style="width:100%">{{curr_study.drug_concentration}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Sample</td>
+									<td colspan="2" style="word-break: break-all;">{{curr_study.sample |safe}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Perturbation</td>
+									<td colspan="2" style="width:100%">{{curr_study.perturbation}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Disease</td>
+									<td colspan="2" style="width:100%">{{curr_study.disease}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Other</td>
+									<td colspan="2" style="width:100%">{{curr_study.other}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Organism</td>
+									<td colspan="2" style="width:100%">{{curr_study.organism}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Strategy</td>
+									<td colspan="2" style="width:100%">{{curr_study.strategy}}</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Data Source</td>
+									<td colspan="2">{{curr_study.data_source}}
+									</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">Data preprocessing information</td>
+									<td colspan="2">{{curr_study.Data_prepro_info}}
+									</td>
+								</tr>
+								<tr>
+									<td class=" bg-light">PubMed ID</td>
+									<td colspan="2"><a href="https://pubmed.ncbi.nlm.nih.gov/{{curr_study.pmid}}" style="color: #0000ff;">{{curr_study.pmid}}</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+
+<script>
+	function build_external_links() {
+		dbXrefs = "{{curr_geneinfo.dbxrefs}}"
+		tr = "<td colspan='2' >";
+		xrefs = dbXrefs.split('|');
+		links = []
+		xrefs.forEach(function(xref) {
+			split_ind = xref.indexOf(':');
+			x_id = xref.slice(split_ind + 1);
+			x_link = XREF_DICT[xref.slice(0, split_ind)];
+			if (typeof x_link != 'undefined') {
+				link = '<a style="color:blue" href="' + x_link + x_id + '" target="_blank">' + xref + '</a>';
+				// console.log(link)
+			} else {
+				link = xref;
+			}
+			links.push(link);
+		});
+		links = links.join(' ');
+		tr = tr + links + "</td>";
+		$("#ext_links").append(tr);
+		// console.log(tr)
+	}
+	$(document).ready(function() {
+		build_external_links()
+	})
+
+	const XREF_DICT = {
+		'HGNC': 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/',
+		'MIM': 'https://omim.org/entry/',
+		'Ensembl': 'https://ensembl.org/id/',
+		'AllianceGenome': 'https://www.alliancegenome.org/gene/',
+		'MGI': 'http://www.informatics.jax.org/marker/',
+		'FLYBASE': 'http://flybase.org/reports/',
+		'WormBase': 'https://wormbase.org/species/c_elegans/gene/',
+		'Araport': 'https://bar.utoronto.ca/thalemine/portal.do?externalids=',
+		'TAIR': 'https://www.arabidopsis.org/servlets/Search?type=general&search_action=detail&sub_type=gene&name=',
+		'ZFIN': 'https://zfin.org/',
+		'AllianceGenome': 'https://www.alliancegenome.org/gene/',
+		'ECOCYC': 'https://biocyc.org/gene?orgid=ECOLI&id=',
+		'RGD': 'https://rgd.mcw.edu/rgdweb/report/gene/main.html?id=',
+		'EnsemblRapid': 'https://asia.ensembl.org/Rattus_norvegicus/Gene/Summary?g=',
+		'SGD': 'https://www.yeastgenome.org/locus/',
+		'miRBase': 'https://www.mirbase.org/cgi-bin/mirna_entry.pl?acc=',
+		'NCBI': 'https://www.ncbi.nlm.nih.gov/gene/?term=',
+		'knockTF': 'http://www.licpathway.net/KnockTFv2/search/search_tf_result.php?species_tf=Mus+musculus&tf_name=',
+	}
+</script>

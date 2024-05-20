@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+	
+	{% include 'public_templates/bootstrap.html' %}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.12.1/css/jquery.dataTables.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+	<!-- jQuery -->
+	<!-- <script type="text/javascript" charset="utf8" src="/cellinteract_static/js/jquery-1.10.2.min.js"></script> -->
+	<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+	<script type="text/javascript" charset="utf8" src="http://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+{#	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>#}
+    <script src="https://cdn.bootcdn.net/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.13/lib/theme-chalk/index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+    <script src="/timecourse_app_static/cdn/js/en.js"></script>
+    <script src="https://unpkg.com/element-ui@2.15.13/lib/index.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.3.6/axios.min.js"></script>
+{#    <script src="https://unpkg.com/element-ui@2.15.13/lib/locale/lang/en.js"></script>#}
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style type="text/css">
+		#home span {
+			background-color: aliceblue;
+		}
+	
+		.form-group {
+			margin-bottom: 3px;
+		}
+	
+		#features {
+			position: relative
+		}
+		
+		.loader {
+		  border: 16px solid #f3f3f3;
+		  border-radius: 50%;
+		  border-top: 16px solid #17a2b8;
+		  width: 120px;
+		  height: 120px;
+		  -webkit-animation: spin 2s linear infinite; /* Safari */
+		  animation: spin 2s linear infinite;
+		}
+		/* 循环提示样式 */
+		.genenames_pulldown {
+			/* 移除默认的列表样式 */
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+			position: absolute;
+		}
+		
+		.genenames_pulldown li{
+			border: 1px solid #ddd;
+			/* 链接添加边框 */
+			margin-top: -1px;
+			background-color: #ffffff;
+			padding: 2px 10px 2px 10px;
+			text-decoration: none;
+			font-size: 10px;
+			color: black;
+			display: block;
+			position: relative;
+			z-index: 100;
+			width:100px
+		}
+		
+		.genenames_pulldown li.header {
+			background-color: #e2e2e2;
+			cursor: default;
+		}
+		
+		.genenames_pulldown li:hover:not(.header) {
+			background-color: #eee;
+		}
+		
+		
+		#Search_Single_datatable thead, #Search_Single_datatable th,
+		#corr_table thead, #corr_table th {
+			text-align: center;
+		}
+		td.studyId {
+			color: #17a2b8;
+			text-decoration: underline;
+		}
+		
+		td.studyId:hover {
+			color: #138496;
+			cursor: pointer;
+		}
+		td.genename {
+			color: #17a2b8;
+			text-decoration: underline;
+		}
+		
+		td.genename:hover {
+			color: #138496;
+			cursor: pointer;
+		}
+		.dataTable {
+						text-align: center;
+					}
+				
+					.index {
+						font-size: 1.9rem;
+					}
+				
+					.list-group a {
+						margin-left: 5px;
+					}
+				
+					table tbody tr td {
+						width: 200px;
+					}
+				
+					#list-item-1,
+					#list-item-2,
+					#list-item-3,
+					#list-item-4,
+					#list-item-5,
+					#list-item-6,
+					#list-item-7,
+					#list-item-8
+					{
+						padding-top: 10px;
+						padding-bottom: 10px;
+						padding-left: 1rem;
+					}
+					.dt-button.icon_:before {
+						color: #fff;
+						padding-top: 10px;
+						content: "\f019";
+						font-family: FontAwesome;
+						font-size: 20px;
+					}
+					.dt-button.icon_{
+						background-color: #17a2b8;
+						border-color: #17a2b8;
+					}
+					.dt-button {
+						margin-top: 5px;
+					}
+					/* datatable search */
+					.dataTables_filter {
+						margin-top: 5px;
+					}
+					/* datatable info */
+					.dataTables_info {
+						margin-left: -30px;
+					}
+					
+					.dataTables_length {
+						margin-top: 5px;
+					}
+					.container {
+						{#margin-top: 1rem;#}
+						{#margin-bottom: 1rem;#}
+					}
+		
+	</style>
+	<script>
+		$(document).ready(function() {
+			// 导航栏加亮
+			$("#nav_search").addClass("active");
+			$("#organism_nav").addClass("active");
+			$("#page_title").text('SEARCH');
+		});
+		
+		document.onkeydown = function(event) {
+		 var keyNum = window.event.keyCode
+		 if (keyNum == 13) {
+		  select_value = $(".sm_over").text()
+		  console.log(select_value)
+		  if (select_value != ""){
+		   select_data($(".sm_over a").parent())
+		  }
+		
+		 }
+		
+		}
+	</script>
+	
+</head>
+<body>
+	<!-- 导航栏 -->
+	{% include 'public_templates/nav_tem.html' %}
+	{% include 'public_templates/page_title.html' %}
+	<!-- 主体内容 -->
+	<div id="app" class="container">
+	    <div class="col-sm-12" style="margin-top: 1rem">
+			<!-- 选择三种查询标签 -->
+			<div class="" style="border: 1px solid #d0d6d6; border-radius: 0 0 5px 5px">
+				<form id="form_adv_search" action="/pertorg/adv_search_result" method="post">
+										{% csrf_token %}
+				<!-- 三种查询标签的help -->
+				<div class="tab-content" id="search_help">
+					<br>
+					<div class="col-sm-12 tab-pane show active" id="model_help">
+						<div class="col-sm-12 in collapse" id="model_help_content" aria-expanded="true" style="">
+							<div class="panel-body">
+							<br>
+							<p>Model Types</p>
+							<ul>
+								<li><strong>Linear Model:</strong> captures genes profiles with linear expression changes over time,
+								aiding in the study of developmental processes or responses to stimuli.
+								<li><strong>Constant Model:</strong> identifies genes profiles with stable expression levels over time, serving as internal controls or reference genes.
+								<li><strong>Logistic Model:</strong> identifies genes profiles exhibiting gradual transitions or switch-like behavior, such as in cell differentiation or fate determination.
+								<li><strong>Logarithmic Model:</strong> detecting genes profiles with linear growth or decay patterns, related to aging, proliferation, and metabolic processes.
+								<li><strong>Exponential Model:</strong> identifies genes profiles with exponential growth or decay patterns, applicable to cellular growth and viral replication.
+								<li><strong>Power Model:</strong> captures genes profiles with power-law relationships, indicating involvement in complex regulatory networks or signaling pathways.
+								<li><strong>Trigonometric Model:</strong> identifies genes profiles with cyclic or periodic expression patterns, relevant in circadian rhythms and cell cycle progression.
+                                <li><strong>Quadratic Model:</strong> detects genes profiles with concave or convex expression patterns, aiding in the study of biological processes with distinct phases or transitions.</li>
+								</p>
+							</ul>
+							<p>Parameters</p>
+							<ul>
+							  <li>The first five conditions can be arbitrarily selected, and finally enter the gene you want
+                                  to query, you can get the screening results.</li>
+                              <br>
+                              <p><strong>Note:</strong> Due to the large amount of data when
+                                  entering genes, there will be a little delay, wait for a moment.</p>
+							</ul>
+							</div>
+						</div>
+						<a data-toggle="collapse" data-target="#model_help_content" href="###" class="" aria-expanded="true">
+							<p style="text-align: center;">--- Help ---</p>
+						</a>
+					</div>
+				</div>
+			
+				
+				<div class="container col-12">
+					<!-- 选项卡导航 -->
+					<div class="tab-content" id="myTabContent">
+						<!-- 高级搜索 -->
+						<!-- <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab"> -->
+						
+						<div class="border border-secondary rounded " style="padding: 1rem;">
+							<!-- /gene_edit/adv_search_result -->
+							<form>
+								{% csrf_token %}
+								<div id="model_search">
+									<div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="exampleFormControlSelect1">Organism</label>
+{#												<select name="organism" class="form-control" id="organism" required="required">#}
+{#													<option disabled="disabled" selected="selected">Please select organism</option>#}
+{#													<option value="Arabidopsis_thaliana">Arabidopsis thaliana</option>#}
+{#													<option value="Caenorhabditis_elegans">Caenorhabditis elegans</option>#}
+{#													<option value="Danio_rerio">Danio rerio</option>#}
+{#													<option value="Drosophila_melanogaster">Drosophila melanogaster</option>#}
+{#													<option value="Escherichia_coli">Escherichia coli</option>#}
+{#													<option value="Mus_musculus">Mus musculus</option>#}
+{#													<option value="Rattus_norvegicus">Rattus norvegicus</option>#}
+{#													<option value="Saccharomyces_cerevisiae">Saccharomyces cerevisiae</option>#}
+{#													<option value="Homo_sapiens">Homo sapiens</option>#}
+{#													<option value="Bos_taurus">Bos taurus</option>#}
+{#													<option value="Oryza_sativa">Oryza sativa</option>#}
+{#													<option value="Sus_scrofa">Sus scrofa</option>#}
+{#													<option value="Macaca_mulatta">Macaca mulatta</option>#}
+{#													<option value="All Organisms">All Organisms</option>#}
+{#												</select>#}
+                                            <el-select name="organism" :style="{width: '100%'}" filterable remote v-model="organism" :remote-method="searchSelectItems_organism" id="el_organism" @change="change_searchSelectItems" placeholder="Please select organism">
+                                                <el-option
+                                                        v-for="(item, index) in organism_list"
+                                                        :key="item"
+                                                        :label="item"
+                                                        :value="item">
+                                                </el-option>
+                                            </el-select>
+										</div>
+										<div class="form-group col-md-6">
+											<label for="exampleFormControlSelect1">Experiment Type</label>
+{#												<select name="experiment_type" class="form-control" id="experiment_type" required="required" >#}
+{#													<option disabled="disabled" selected="selected">Please select experiment type</option>#}
+{#													<option value="Drug_treatment">Drug or reagent treatment</option>#}
+{#													<option value="Stress_treatment">Stress treatment</option>#}
+{#													<option value="development">Differentiation or development</option>#}
+{#													<option value="Virus_bacterial_infection">Virus or bacterial infection</option>#}
+{#													<option value="Gene_editing">Gene editing</option>#}
+{#												</select>#}
+                                            <el-select name="experiment_type" :style="{width: '100%'}" filterable remote v-model="experiment_type" @change="change_searchSelectItems" :remote-method="searchSelectItems_experiment_type" id="el_experiment_type"  placeholder="Please select experiment type">
+                                                <el-option
+                                                        v-for="(item, index) in experiment_type_list"
+                                                        :key="item"
+                                                        :label="item"
+                                                        :value="item">
+                                                </el-option>
+                                            </el-select>
+										</div>
+										<div class="form-group col-md-6">
+											<label for="exampleFormControlSelect1">Model Type</label>
+                                            <el-select name="model_type" :style="{width: '100%'}" filterable remote v-model="model_type" @change="change_searchSelectItems" :remote-method="searchSelectItems_model_type" id="el_model_type"  placeholder="Please select model type">
+                                                <el-option
+                                                        v-for="(item, index) in model_type_list"
+                                                        :key="item"
+                                                        :label="item"
+                                                        :value="item">
+                                                </el-option>
+                                            </el-select>
+										</div>
+
+										<div class="form-group col-md-6">
+											<label for="exampleFormControlSelect1">Tissue/Cell Type</label>
+                                            <el-select name="tissue" :style="{width: '100%'}" filterable remote v-model="tissue" @change="change_searchSelectItems" :remote-method="searchSelectItems_tissue" id="el_tissue"  placeholder="Please select tissue/cell type">
+                                                <el-option
+                                                        v-for="(item, index) in tissue_list"
+                                                        :key="item"
+                                                        :label="item"
+                                                        :value="item">
+                                                </el-option>
+                                            </el-select>
+										</div>
+										<div class="form-group col-md-6">
+											<label for="exampleFormControlSelect1">Data Type</label>
+                                            <el-select name="data_type" :style="{width: '100%'}" filterable remote v-model="data_type" @change="change_searchSelectItems" :remote-method="searchSelectItems_data_type" id="el_data_type"  placeholder="Please select data type">
+                                                <el-option
+                                                        v-for="(item, index) in data_type_list"
+                                                        :key="item"
+                                                        :label="item"
+                                                        :value="item">
+                                                </el-option>
+                                            </el-select>
+										</div>
+										<div class="form-group col-md-6">
+											<label for="exampleFormControlSelect1">Gene Symbol</label>
+												<!-- <select name="gene_name" class="form-control" id="gene_name" required="required">
+													<option disabled="disabled" selected="selected">Please select gene</option>
+												</select> -->
+{#												<input type="text" class="form-control gene_search_box" id="gene_name" placeholder="e.g. A1BG" name="gene">#}
+{#													<ul id="genenames" class="genenames_pulldown">#}
+{#													</ul>#}
+                                            <br>
+                                            <el-select name="gene" :style="{width: '100%'}" filterable remote v-model="geneName" :remote-method="searchGeneMethod" id="gene_name" name="gene_name" placeholder="Please enter gene">
+                                                <el-option
+                                                        v-for="(item, index) in geneNameList"
+                                                        :key="item"
+                                                        :label="item"
+                                                        :value="item">
+                                                </el-option>
+                                            </el-select>
+										</div>
+									</div>
+								</div>
+								<br/>
+								<button type="button" class="btn btn-info" id='form_search_model' style="margin-top: 0rem;">Submit</button>
+{#								<button type="reset" class="btn btn-info" @click="reset_input" onclick="reset_example()" style="margin-top: 0px;background: #99c3c7;border: #99c3c7;height: 40.25px;">Reset</button>#}
+                                <button type="reset" class="btn btn-info" @click="reset_input" style="margin-top: 0px;background: #99c3c7;border: #99c3c7;height: 40.25px;">Reset</button>
+							</form>
+						</div>
+						
+					</div>
+				</div>
+                </form>
+			</div>
+		</div>
+		<div class="loader" id="search_model_loader" style="display: none;"> </div>
+		<div id="Single_result" style="display: none;">
+			<h3 class="panel-heading"
+				style="margin: 1rem 0 0rem 0 ;background-color: #17a2b8;color: #ffffff;">Genes with changed expression trends
+			</h3>
+			<!-- <div class="loader" id="search_pathway_loader" style="display: none;">
+			</div> -->
+			<table id="Search_Single_datatable" class="display" style="width: 100%;">
+				<thead>
+					<tr>
+						<th>Studyid</th>
+						<th>Gene</th>
+						<th>Tissue</th>
+						<th>Organism</th>
+						<th>Strategy</th>
+						<th>Cluster</th>
+						<th>Model</th>
+						<th>Experiment_type</th>
+						<th>Trend Plot</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div id="searchPathwayChordModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content">
+						  <div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLongTitle">Gene trend chart</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							  <span aria-hidden="true">&times;</span>
+							</button>
+						  </div>
+						  <div class="modal-body">
+							  <div class="loader" id="loader_modal" style="display: none;">
+							  </div>
+							  <div id="line-chart" style="min-width:400px;height:400px"></div>
+						  </div>
+						</div>
+					</div>
+		</div>
+	</div>
+{#	</div>#}
+{#	</div>#}
+{#	</div>#}
+	
+	{% include 'public_templates/footer.html' %}
+	<script type="text/javascript">
+
+
+        $(document).ready(function () {
+			 {#function reset_example(){#}
+             {#    this.organism = '';#}
+             {#    this.experiment_type = '';#}
+             {#    this.tissue = '';#}
+             {#    this.model_type = '';#}
+             {#    this.data_type = '';#}
+             {#    this.geneName = '';#}
+			 	 {#$("#exampleFormControlSelect1").val("");#}
+			 	 {#$("#organism").val("organism");#}
+                 {#$("#experiment_type").val("experiment_type");#}
+			 	 {#$("#tissue").val("tissue");#}
+			 	 {#$("#model_type").val("model_type");#}
+			 	 {#$("#data_type").val("data_type");#}
+                 {#$("#geneName").val("geneName");#}
+			 {#}#}
+
+
+			function experiment_type_select(){
+						var optionData=new FormData();
+						optionData.append('organism',document.getElementById("organism").value);
+						// console.log(optionData),
+						$.ajax({
+							url:'/GeTeSEPdb/get_experimenttype',
+							type:"POST",
+			
+							headers: {"X-CSRFToken": csrftoken},
+			
+							data:optionData,
+							processData:false,
+							contentType:false,
+							success:function(result_experimenttype_json){
+								var result_experimenttype=JSON.parse(result_experimenttype_json)
+								$("#experiment_type").empty();
+								$('#experiment_type').append('<option disabled="disabled" selected="selected">Please select study type</option>');
+			
+								for(var i = 0; i < result_experimenttype.length; i++){
+									$("#experiment_type").append('<option value="'+ result_experimenttype[i] + '">' + result_experimenttype[i] +'</option>')
+								};
+								// $("#model_type").append('<option value="All Model Type">All Model Type</option>')
+			
+							}
+						})
+					}
+			function model_select(){
+						var optionData=new FormData();
+						optionData.append('organism',document.getElementById("organism").value);
+						optionData.append('experiment_type',document.getElementById("experiment_type").value);
+						// console.log(optionData),
+						$.ajax({
+							url:'/GeTeSEPdb/get_modeltype',
+							type:"POST",
+			
+							headers: {"X-CSRFToken": csrftoken},
+			
+							data:optionData,
+							processData:false,
+							contentType:false,
+							success:function(result_modeltype_json){
+								var result_studytype=JSON.parse(result_modeltype_json)
+								$("#model_type").empty();
+								$('#model_type').append('<option disabled="disabled" selected="selected">Please select study type</option>');
+			
+								for(var i = 0; i < result_studytype.length; i++){
+									$("#model_type").append('<option value="'+ result_studytype[i] + '">' + result_studytype[i] +'</option>')
+								};
+								// $("#model_type").append('<option value="All Model Type">All Model Type</option>')
+			
+							}
+						})
+					}
+			function tissue_select(){
+						var optionData=new FormData();
+						optionData.append('organism',document.getElementById("organism").value);
+						optionData.append('experiment_type',document.getElementById("experiment_type").value);
+						optionData.append('model_type',document.getElementById("model_type").value);
+						$.ajax({
+							url:'/GeTeSEPdb/get_tissue',
+							type:"POST",
+			
+							headers: {"X-CSRFToken": csrftoken},
+			
+							data:optionData,
+							processData:false,
+							contentType:false,
+							success:function(result_tissue_json){
+								var result_tissue=JSON.parse(result_tissue_json)
+			
+								$("#tissue_cell_type").empty();
+								$("#tissue_cell_type").append('<option disabled="disabled" selected="selected">Please select tissue or cell type</option>');
+								// $("#tissue").append('<option value="All Tissue">All Tissue</option>');
+								for(var i = 0; i < result_tissue.length; i++){
+									$("#tissue_cell_type").append('<option value="'+ result_tissue[i] + '">' + result_tissue[i] +'</option>')
+								}
+			
+			
+							}
+						})
+					}
+			
+					function datatype_select(){
+						var optionData=new FormData();
+						optionData.append('organism',document.getElementById("organism").value);
+						optionData.append('experiment_type',document.getElementById("experiment_type").value);
+						optionData.append('model_type',document.getElementById("model_type").value);
+						optionData.append('tissue_cell_type',document.getElementById("tissue_cell_type").value);
+						$.ajax({
+							url:'/GeTeSEPdb/get_datatype',
+							type:"POST",
+			
+							headers: {"X-CSRFToken": csrftoken},
+			
+							data:optionData,
+							processData:false,
+							contentType:false,
+							success:function(result_datatype_json){
+								var result_datatype=JSON.parse(result_datatype_json)
+								$("#data_type").empty();
+								$("#data_type").append('<option disabled="disabled" selected="selected">Please select Datatype</option>');
+								// $("#data_type").append('<option value="All Datatype">All Datatype</option>');
+								for(var i = 0; i < result_datatype.length; i++){
+									$("#data_type").append('<option value="'+ result_datatype[i] + '">' + result_datatype[i] +'</option>')
+								}
+			
+			
+							}
+						})
+					}
+			
+					function gene_selcet(){
+						var optionData=new FormData();
+						optionData.append('organism',document.getElementById("organism").value);
+						optionData.append('experiment_type',document.getElementById("experiment_type").value);
+						optionData.append('model_type',document.getElementById("model_type").value);
+						optionData.append('tissue_cell_type',document.getElementById("tissue_cell_type").value);
+						optionData.append('data_type',document.getElementById("data_type").value);
+						$.ajax({
+							url:'/GeTeSEPdb/get_gene',
+							type:"POST",
+			
+							headers: {"X-CSRFToken": csrftoken},
+			
+							data:optionData,
+							processData:false,
+							contentType:false,
+							success:function(result_gene_json){
+								var result_gene=JSON.parse(result_gene_json)
+								$("#gene_name").empty();
+								$("#gene_name").append('<option disabled="disabled" selected="selected">Please select Genename</option>');
+                                //$("#gene_name").append('<option disabled="disabled" selected="selected">No data available</option>');
+								// $("#gene_name").append('<option value="All Gene">All Gene</option>');
+								for(var i = 0; i < result_gene.length; i++){
+									$("#gene_name").append('<option value="'+ result_gene[i] + '">' + result_gene[i] +'</option>')
+								}
+			
+			
+							}
+						})
+					}
+			
+			
+			
+			var csrftoken = $("input[name='csrfmiddlewaretoken']").attr('value');
+			console.log(csrftoken)
+			
+			function odb_ajax(url, postData) {
+				o_ajax = {
+					type: 'POST',
+					url: url,
+					headers: {'X-CSRFToken': '{{csrf_token}}'},
+					data: postData ,//used to pass data set choice i.e gtex or organoidDB
+					processData:false,
+					contentType:false,
+				}
+				return o_ajax;
+			}
+			
+			var Search_Single_datatable = $('#Search_Single_datatable').DataTable({
+						data: [],
+						"dom": "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-8'i><'col-sm-12 col-md-3'f>>" +
+							"<'row'<'col-sm-12'tr>>" +
+							"<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>>",
+						buttons: [{
+								extend: 'csv',
+								text: "",
+								className: "icon_",
+								}],
+						lengthMenu: [[10,25,50,100,500,1000], [10,25,50,100,500,1000]],
+						columns: [
+							{
+								title: 'Project ID',
+								data: 'studyid',
+								className: 'studyId',
+							},
+							{
+								title: 'Gene',
+								data: 'gene',
+								className: "genename",
+							},
+							{
+								title: 'Tissue/Cell type',
+								data: 'tissue_cell_type',
+								// render: $.fn.dataTable.render.number('', '.', 3),
+							},
+							{
+								title: 'Organism',
+								data: 'organism',
+								// render: $.fn.dataTable.render.number('', '.', 3),
+							},
+							{
+								title: 'Data type',
+								data: 'strategy',
+							},
+							{
+								title: 'Cluster',
+								data: 'cluster',
+							},
+							{
+								title: 'Model',
+								data: 'model',
+							},
+							{
+								title: 'Experiment type',
+								data: 'experiment_type',
+							},
+							{data: null,
+							 defaultContent: "<button class='btn btn-info' style='background: url(/timecourse_app_static/img/lineplot.png);width: 1.8rem;height: 2rem;border: none;'></button>",
+							}
+						]
+					});
+					console.log(Search_Single_datatable)
+			
+
+            $("#organism").change(function(e) {
+                experiment_type_select();
+            });
+            $("#experiment_type").change(function(e) {
+                model_select();
+            });
+            $("#model_type").change(function(e) {
+                tissue_select();
+            });
+            $("#tissue_cell_type").change(function(e) {
+                datatype_select();
+            });
+            $("#data_type").change(function(e) {
+                gene_selcet();
+            });
+            {#id="model_type" required="required" onchange="tissue_select()"#}
+            {#id="tissue_cell_type" required="required"  onchange="datatype_select()"#}
+            {#id="data_type" required="required"  onchange="gene_selcet()"#}
+
+                    {#experiment_type#}
+            $('#form_search_model').click(function(e){
+					// e.preventDefault();
+					// reset_content();
+
+
+					var optionData=new FormData();
+					optionData.append('gene_name',document.getElementById("gene_name").value);
+					optionData.append('organism',document.getElementById("el_organism").value);
+					optionData.append('experiment_type',document.getElementById("el_experiment_type").value);
+					optionData.append('model_type',document.getElementById("el_model_type").value);
+					optionData.append('tissue_cell_type',document.getElementById("el_tissue").value);
+					optionData.append('data_type',document.getElementById("el_data_type").value);
+
+					// console.log(searchedstudytype);
+
+
+					url = '/GeTeSEPdb/get_datatable';
+					$('#search_model_loader').show();
+					$('#Single_result').show();
+					$('#Search_Single_datatable').hide();
+
+					window.dispatchEvent(new Event('resize'));
+					$.when(
+						$.ajax(odb_ajax(url, optionData)).then(function(result_genetable_json){
+						result_datatable = JSON.parse(result_genetable_json);
+
+						console.log(result_datatable)
+						Search_Single_datatable.clear();
+						Search_Single_datatable.rows.add(result_datatable).draw();
+
+						$('#search_model_loader').hide();
+						$('#Single_result').show();
+						$('#Search_Single_datatable').show();
+						window.dispatchEvent(new Event('resize'));
+
+						}),
+					).fail(function(){
+						alert('Something went wrong');
+					});
+
+				});
+
+
+		$('#Search_Single_datatable').on('click', 'tbody .studyId', function(){
+			tr_data = Search_Single_datatable.row($(this).parents('tr')).data();
+			studyid = tr_data.studyid;
+			window.location = './detail/'+studyid;
+		});
+
+		$('#Search_Single_datatable').on('click', 'tbody button', function(){
+		    var tr_data = Search_Single_datatable.row($(this).parents('tr')).data();
+		    var optionData = new FormData();
+		    optionData.append('studyid', tr_data.studyid);
+		    optionData.append('cluster', tr_data.cluster);
+		    optionData.append('gene', tr_data.gene);
+            optionData.append('model', tr_data.model);
+		    gene = tr_data.gene;
+		    $.ajax({
+		        type: 'POST',
+		        url: '/GeTeSEPdb/plot_trend',
+		        headers: { "X-CSRFToken": '{{csrf_token}}' },
+		        data: optionData,
+		        processData: false,
+		        contentType: false,
+		        success: function(plot_data){
+					plot_data = JSON.parse(plot_data);
+
+		            var trend_data = plot_data.trend_data;
+		            var tread_data_line = plot_data.tread_data_line;
+
+		            var x_Axis = plot_data.x_Axis;
+
+		            var time = trend_data.x;
+		            var geneData = trend_data.y;
+		            var gene = trend_data.z;
+		            var traceData = [];
+		            var trace1 = {
+		                x: x_Axis,
+		                y: geneData,
+		                name: "expression value",
+		                mode: 'markers'
+		            };
+		            var trace2 = {
+		                x: tread_data_line.x,
+		                y: tread_data_line.y,
+		                mode: 'lines',
+		                name: 'predicted value'
+		            };
+		            traceData.push(trace1, trace2);
+
+		            var lineChartLayout = {
+		                title: gene + ' trend chart',
+		                xaxis: {
+		                    title: 'Time Series'
+		                },
+		                yaxis: {
+		                    title: 'Gene Expression Value'
+		                }
+		            };
+
+		            Plotly.newPlot('line-chart', traceData, lineChartLayout);
+
+		            $('#loader_modal').hide();
+		            $('#search_model').show();
+		        },
+		        error: function(error){
+		            alert('Something went wrong');
+		            console.log(error);
+		        }
+		    });
+
+		    $('#exampleModalLongTitle').text(gene + ' trend chart');
+		    $('#searchPathwayChordModal').modal('show');
+		    $('#search_model').hide();
+		    $('#loader_modal').show();
+		});
+
+		$('#Search_Single_datatable').on('click', 'tbody .genename', function(){
+			// console.log(1111)
+			var tr_data = Search_Single_datatable.row($(this).parents('tr')).data();
+			var studyid = tr_data.studyid
+			var cluster = tr_data.cluster
+			var gene = tr_data.gene
+			// var optionData = new FormData();
+			// optionData.append('studyid', tr_data.studyid);
+			// optionData.append('cluster', tr_data.cluster);
+			// optionData.append('gene', tr_data.gene);
+			// console.log(optionData);
+			window.location = "./gene_detail/" + gene + "?gene=" + gene + "&studyid=" + studyid + "&cluster=" + cluster;
+		})
+
+		// 获取基因名
+		$(".gene_search_box").keyup(function(){
+
+			// var input_ = document.getElementById('gene_search');
+			var optionData=new FormData();
+			optionData.append('organism',document.getElementById("organism").value);
+			optionData.append('model_type',document.getElementById("model_type").value);
+			optionData.append('tissue',document.getElementById("tissue").value);
+			optionData.append('data_type',document.getElementById("data_type").value);
+			optionData.append('input_',document.getElementById("gene_name").value);
+			// postData="organism="+sampleType+"&"+commonSearchOpt+"&input_="+input_.value.toUpperCase()
+			$.when($.ajax(odb_ajax('/GeTeSEPdb/get_gene_names', optionData)))
+			 .done(function(data){
+				resp_data = JSON.parse(data);
+				var li_value_list=resp_data['data_list']
+				var li_lables=""
+				genenames_dict={
+					'gen_tab':'gene_name',
+				}
+				var input, filter, ul, li, a, i;
+
+				input = document.getElementById('gene_name');
+				filter = input.value.toUpperCase();
+				ul_id='genenames'
+				ul = document.getElementById(ul_id);
+
+				for (var list_value of li_value_list){
+					if ((filter=="") || (filter.length==1)){
+						$('#'+ul_id).empty();
+						return
+					}
+					li_lables=li_lables+('<li onmousedown="assign_value(this)">'+list_value+'</li>')
+				}
+				$('#'+ul_id).empty();
+				$('#'+ul_id).append(li_lables);
+			})
+		});
+
+		document.onmouseup =function(){
+			input_frame=['#genenames']
+
+			for (var input_id of input_frame){
+				$(input_id).empty();
+			}
+		}
+        })
+
+		
+		</script>
+
+    <script>
+
+        ELEMENT.locale({
+                el: {
+                    colorpicker: {
+                        confirm: 'OK',
+                        clear: 'Clear'
+                    },
+                    datepicker: {
+                        now: 'Now',
+                        today: 'Today',
+                        cancel: 'Cancel',
+                        clear: 'Clear',
+                        confirm: 'OK',
+                        selectDate: 'Select date',
+                        selectTime: 'Select time',
+                        startDate: 'Start Date',
+                        startTime: 'Start Time',
+                        endDate: 'End Date',
+                        endTime: 'End Time',
+                        prevYear: 'Previous Year',
+                        nextYear: 'Next Year',
+                        prevMonth: 'Previous Month',
+                        nextMonth: 'Next Month',
+                        year: '',
+                        month1: 'January',
+                        month2: 'February',
+                        month3: 'March',
+                        month4: 'April',
+                        month5: 'May',
+                        month6: 'June',
+                        month7: 'July',
+                        month8: 'August',
+                        month9: 'September',
+                        month10: 'October',
+                        month11: 'November',
+                        month12: 'December',
+                        week: 'week',
+                        weeks: {
+                            sun: 'Sun',
+                            mon: 'Mon',
+                            tue: 'Tue',
+                            wed: 'Wed',
+                            thu: 'Thu',
+                            fri: 'Fri',
+                            sat: 'Sat'
+                        },
+                        months: {
+                            jan: 'Jan',
+                            feb: 'Feb',
+                            mar: 'Mar',
+                            apr: 'Apr',
+                            may: 'May',
+                            jun: 'Jun',
+                            jul: 'Jul',
+                            aug: 'Aug',
+                            sep: 'Sep',
+                            oct: 'Oct',
+                            nov: 'Nov',
+                            dec: 'Dec'
+                        }
+                    },
+                    select: {
+                        loading: 'Loading',
+                        noMatch: 'No matching data',
+                        noData: 'No data',
+                        placeholder: 'Select'
+                    },
+                    cascader: {
+                        noMatch: 'No matching data',
+                        loading: 'Loading',
+                        placeholder: 'Select',
+                        noData: 'No data'
+                    },
+                    pagination: {
+                        goto: 'Go to',
+                        pagesize: '/page',
+                        total: 'Total {total}',
+                        pageClassifier: ''
+                    },
+                    messagebox: {
+                        title: 'Message',
+                        confirm: 'OK',
+                        cancel: 'Cancel',
+                        error: 'Illegal input'
+                    },
+                    upload: {
+                        deleteTip: 'press delete to remove',
+                        delete: 'Delete',
+                        preview: 'Preview',
+                        continue: 'Continue'
+                    },
+                    table: {
+                        emptyText: 'No Data',
+                        confirmFilter: 'Confirm',
+                        resetFilter: 'Reset',
+                        clearFilter: 'All',
+                        sumText: 'Sum'
+                    },
+                    tree: {
+                        emptyText: 'No Data'
+                    },
+                    transfer: {
+                        noMatch: 'No matching data',
+                        noData: 'No data',
+                        titles: ['List 1', 'List 2'], // to be translated
+                        filterPlaceholder: 'Enter keyword', // to be translated
+                        noCheckedFormat: '{total} items', // to be translated
+                        hasCheckedFormat: '{checked}/{total} checked' // to be translated
+                    },
+                    image: {
+                        error: 'FAILED'
+                    },
+                    pageHeader: {
+                        title: 'Back' // to be translated
+                    },
+                    popconfirm: {
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'No'
+                    },
+                    empty: {
+                        description: 'No Data'
+                    }
+                }
+            });
+
+        new Vue({
+            el: "#app",
+            data: {
+                geneName: '',
+                experiment_type: '',
+                organism: '',
+                tissue: '',
+                data_type: '',
+                model_type: '',
+                geneNameList: [
+
+                ],
+                experiment_type_list: [],
+                organism_list: [],
+                tissue_list: [],
+                data_type_list: [],
+                model_type_list: [],
+            },
+            mounted() {
+                this.change_searchSelectItems()
+            },
+            methods: {
+                reset_input() {
+                    {#this.change_searchSelectItems()#}
+                    this.organism = '';
+                    this.experiment_type = '';
+                    this.tissue = '';
+                    this.model_type = '';
+                    this.data_type = '';
+                    this.geneName = '';
+                    this.change_searchSelectItems();
+                },
+                // 获取cookie
+                getCookie(cname) {
+                    var name = cname + "=";
+                    var ca = document.cookie.split(';');
+                    for(var i=0; i<ca.length; i++)
+                    {
+                        var c = ca[i].trim();
+                        if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+                    }
+                    return "";
+                },
+                searchSelectItems_experiment_type(query) {
+                    let items = this.searchSelectItems(query, 'experiment_type')
+                },
+                searchSelectItems_organism(query) {
+                    let items = this.searchSelectItems(query, 'organism')
+                    {#console.log(items)#}
+                    {#this.organism_list = items;#}
+                },
+                searchSelectItems_tissue(query) {
+                    this.searchSelectItems(query, 'tissue')
+                },
+                searchSelectItems_data_type(query) {
+                    this.searchSelectItems(query, 'data_type')
+                },
+                searchSelectItems_model_type(query) {
+                    this.searchSelectItems(query, 'model_type')
+                },
+                change_searchSelectItems() {
+                    console.log('change')
+                    this.searchSelectItems_tissue('')
+                    this.searchSelectItems_organism('')
+                    this.searchSelectItems_experiment_type('')
+                    this.searchSelectItems_data_type('')
+                    this.searchSelectItems_model_type('')
+                    console.log('change3')
+                },
+                searchSelectItems(query, type) {
+                    const service = axios.create({
+                        baseURL: '',
+                        timeout: 20000,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': this.getCookie("csrftoken")
+                        }
+                    })
+
+                    var formData=new FormData();
+                    formData.append('type', type);
+                    formData.append('organism', this.organism);
+                    formData.append('model_type', this.model_type);
+                    formData.append('tissue', this.tissue);
+                    formData.append('data_type', this.data_type);
+                    formData.append('experiment_type', this.experiment_type);
+                    formData.append('input_', query);
+
+                    let that = this
+                    service.post('/GeTeSEPdb/search_adv_select_items', formData).then(function (res) {
+                        {#console.log(res.data)#}
+                        that[type + '_list'] = res.data.items
+                        console.log(that[type + '_list'])
+                    }).catch(function (error) {
+                        console.log(error)
+                    });
+                },
+                searchGeneMethod(query) {
+                    if (query !== '') {
+                        const service = axios.create({
+                            baseURL: '',
+                            timeout: 20000,
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': this.getCookie("csrftoken")
+                            }
+                        })
+
+                        var formData=new FormData();
+                        formData.append('organism', document.getElementById("el_organism").value);
+                        formData.append('model_type', document.getElementById("el_model_type").value);
+                        formData.append('tissue', document.getElementById("el_tissue").value);
+                        formData.append('data_type', document.getElementById("el_data_type").value);
+                        formData.append('experiment_type', document.getElementById("el_experiment_type").value);
+                        formData.append('input_', query);
+
+                        let that = this
+                        service.post('/GeTeSEPdb/get_gene_names', formData).then(function (res) {
+                                that.geneNameList = res.data.data_list
+                            }).catch(function (error) {
+                                console.log(error)
+                            that.geneNameList = [];
+                        });
+                    } else {
+                        this.geneNameList = [];
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>

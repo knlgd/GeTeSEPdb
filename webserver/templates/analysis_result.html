@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html ng-app="ionicApp">
+	<head>
+		<title>ANALYSIS</title>
+		<meta charset="utf-8" http-equiv="Expires" content="0">
+		{% include 'public_templates/bootstrap.html' %}
+		<!-- <link href="/pertorg_static/cdn/css/ionic.css" rel="stylesheet"> -->
+		<!-- <link href="https://cdn.staticfile.org/ionic/1.3.2/css/ionic.css" rel="stylesheet"> -->
+		<script src="https://cdn.staticfile.org/ionic/1.3.2/js/ionic.bundle.min.js"></script>
+		<script src="/timecourse_app_static/cdn/js/plotly-2.8.3.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="/timecourse_app_static/cdn/css/jquery.dataTables.css">
+		<!-- jQuery -->
+		<script type="text/javascript" charset="utf8" src="/timecourse_app_static/cdn/js/jquery-1.10.2.min.js"></script>
+		<!-- DataTables -->
+		<script type="text/javascript" charset="utf8" src="/timecourse_app_static/cdn/js/jquery.dataTables.js"></script>
+		<!-- <script type="text/javascript" charset="utf8" src="/timecourse_app_static/cdn/js/dataTables.buttons.min.js"></script>
+		<script type="text/javascript" charset="utf8" src="/timecourse_app_static/cdn/js/buttons.html5.min.js"></script> -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+		<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+		<script type="text/javascript">
+		angular.module('ionicApp', ['ionic'])
+
+		.controller('MyCtrl', function($scope) {
+
+		});
+		</script>
+		<style>
+		
+			.dataTable {
+				text-align: center;
+			}
+		
+			.index {
+				font-size: 1.9rem;
+			}
+		
+			.list-group a {
+				margin-left: 5px;
+			}
+		
+			table tbody tr td {
+				width: 200px;
+			}
+		
+			#list-item-1,
+			#list-item-2,
+			#list-item-3,
+			#list-item-4,
+			#list-item-5,
+			#list-item-6,
+			#list-item-7,
+			#list-item-8
+			{
+				padding-top: 10px;
+				padding-bottom: 10px;
+				padding-left: 1rem;
+			}
+			.dt-button.icon_:before {
+				color: #fff;
+				padding-top: 10px;
+				content: "\f019";
+				font-family: FontAwesome;
+				font-size: 20px;
+			}
+			.dt-button.icon_{
+				background-color: #17a2b8;
+				border-color: #17a2b8;
+			}
+			.dt-button {
+				margin-top: 5px;
+			}
+			/* datatable search */
+			.dataTables_filter {
+				margin-top: 5px;
+			}
+			/* datatable info */
+			.dataTables_info {
+				margin-left: -30px;
+			}
+			
+			.dataTables_length {
+				margin-top: 5px;
+			}
+			.container {
+				margin-top: 1rem;
+				margin-bottom: 1rem;
+			}
+			
+			#OptimalModelTable caption {
+				font-size: 1.2rem;
+				font-weight: bold;
+				margin-bottom: 0.5rem;
+			}
+			
+			#OptimalModelTable_wrapper {
+				margin-top: -1rem;
+				margin-bottom: 1rem;
+			}
+			
+			p {
+				margin-bottom: 1rem;
+			}
+		
+			h3 {
+				/* color: cornflowerblue; */
+				color: #17a2b8; margin-bottom: 20px;
+				font-weight: bolder;
+			}
+		
+			/* 左侧导航颜色 */
+			.list-group-item.active {
+				background-color: #17a2b8;
+				border: 1px solid rgba(0, 0, 0, .125);
+			}
+		
+			#list-example a {
+				padding-left: 15px;
+			}
+		
+			/* 基本信息样式 */
+			#basic_info tbody tr td {
+				vertical-align: middle;
+			}
+		
+			/* 		.navbar.navbar-dark.text-white.bg-dark{padding-left: 30px;}
+		#navbar-example3{
+			position: fixed;
+			width: 300px;
+			margin-left: 30px;
+			border: 1px solid #000000;
+			border-radius: 10px 10px 10px 10px;
+			height: 580px;
+			margin-bottom: 50px;
+		}
+		#navbar-example3 a{
+			padding-top: 1px;
+			padding-bottom: 1px;
+		
+		} */
+			.nav-link {
+				margin-bottom: 1px;
+			}
+			.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+				margin-bottom: 1px;
+				color: #17a2b8;
+				background-color: #ffffff;
+			}
+			a{color: #FFFFFF;}
+			a:hover {color: #FFFFFF;}
+			.dropdown-item.active, .dropdown-item:active {
+				color: #ffffff;
+				background-color: #17a2b8;
+			}
+			.p1 {border: 0px;border-top: 0px;margin: 0px;}
+			.p2 { border: 0px;border-top: 0px;width: 100%;margin: 0px;display: none;}
+		
+			/* go back to top */
+			#myBtn {
+			    display: none; /* 默认隐藏 */
+			    position: fixed;
+			    bottom: 20px;
+			    right: 30px;
+			    z-index: 99;
+			    border: none;
+			    outline: none;
+			    background-color: red; /* 设置背景颜色，你可以设置自己想要的颜色或图片 */
+			    color: white; /* 文本颜色 */
+			    cursor: pointer;
+			    padding: 15px;
+			    border-radius: 10px; /* 圆角 */
+			}
+		
+			#myBtn:hover {
+			    background-color: #555;
+			}
+		
+		</style>
+		<script>
+			function changeTab(id) {
+				// 处理tab
+				$('#myTab li a').removeClass('active')
+				$('#menu1_tab').parent().children().eq(0).children().eq(0).css('background', '#ffffff')
+				$('#menu1_tab').parent().children().eq(0).children().eq(0).css('color', '#17a2b8')
+		
+				// 处理tabContent
+				$('#myTabContent div').removeClass('active')
+				// $('#myTabContent div').addClass('fade')
+				$('#' + id).removeClass('fade')
+				$('#' + id).addClass('active')
+				$('#myTab li a').preventDefault()
+			}
+			// back to top
+			window.onscroll = function() {scrollFunction()};
+		
+			function scrollFunction() {console.log(121);
+			    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+			        document.getElementById("myBtn").style.display = "block";
+			    } else {
+			        document.getElementById("myBtn").style.display = "none";
+			    }
+			}
+		
+			// 点击按钮，返回顶部
+			function topFunction() {
+			    document.body.scrollTop = 0;
+			    document.documentElement.scrollTop = 0;
+			}
+		
+		</script>
+		<script>
+			$(document).ready(function(){
+			// 导航栏
+			$("#nav_tools").addClass("active");
+			$("tbody").addClass("bg-white");
+			$("#page_title").text('ANALYSIS RESULT');
+			});
+		</script>
+		
+		
+	</head>
+	<body data-spy="scroll" data-target="#list-example" style="padding-top: 0px;">
+		<!-- 导航栏 -->
+		{% include 'public_templates/nav_tem.html' %}
+		{% include 'public_templates/page_title.html' %}
+		<!-- 主体内容 -->
+		{% csrf_token %}
+		<button onclick="topFunction()" id="myBtn" title="backtotop" style="background: #17a2b8;">TOP</button>
+		<!-- 主体内容 -->
+		<div class="container-fluid col-10">
+             <div id="data-loading-area" style="margin-top: 50px;">
+                 <div style="margin: 0 auto; text-align: center; ">
+                     <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-secondary" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-success" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-danger" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-warning" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-info" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-light" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-dark" style="width: 3rem; height: 3rem;" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                 </div>
+                 <div style="margin-top: 20px; text-align: center; font-size: 30px; color: red; font-weight: 600;" role="alert">
+                        The data is being analyzed, please wait!
+                </div>
+             </div>
+			<div style="display: none;" id="data-show-area" class='row'>
+				<div class='col-2 d-none d-xl-block' style="margin: 1rem 50px 1rem 0rem;">
+					<div id="list-example" class="list-group "
+						style="position: fixed; width:250px;height: 500px;margin-left: -50px;padding-left: 0;">
+						<a class="list-group-item list-group-item-action" href="#list-item-1">Model Result</a>
+						<a class="list-group-item list-group-item-action" href="#list-item-2">Gene expression change</a>
+					</div>
+				</div>
+				<script>
+			    </script>
+				<div class='col-xl-9 col-lg-12'>
+
+					<div data-spy="scroll" data-target="#list-example" data-offset="0" class="panel panel-primary">
+
+						<a download="result.zip" href="/GeTeSEPdb/download_result?analysisId={{ analysisId }}" class="btn btn-primary" style="background: #17a2b8;">Download All Result</a>
+						
+							<h3 class="panel-heading" id="list-item-1" style="margin: 1rem 0 0rem 0 ;background-color: #17a2b8;color: #ffffff;">Model Result </h3>
+							<br>
+							<p>Note: Evaluations including CV, R^2, adjusted R^2, minimum Root Mean Square Error (RMSE) and minimum Akaike 
+							Information Criterion (AlC) values of all 8 types of models.</p>
+								<div class="container col-12">
+									<h4>Model Fit Indicators Table</h4>
+									<table id="EvaIndicator" class="display" style="width: 100%;" lazyload="True">
+										 <thead>
+											<tr>
+												<th>Model</th>
+												<th>Rmse</th>
+												<th>Rsq</th>
+												<th>Aic</th>
+												<th>Cluster</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+						<br>		
+						<p>Note: Equations and parameters will be output only for fitted models meeting the criteria.</p>
+								<div class="container col-12">
+									<h4>Optimal Model Table</h4>
+									<table id="ModelDF" class="display" style="width: 100%;" lazyload="True">
+										 <thead>
+											<tr>
+												<th>Cluster</th>
+												<th>Model</th>
+												<th>Parameters</th>
+												<th>Model Formula</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+						
+						<h3 class="panel-heading" id="list-item-2" style="margin: 1rem 0 0rem 0 ;background-color: #17a2b8;color: #ffffff;">
+						Heatmap/Time Series Trend Chart
+						</h3>
+						<div class="border border-secondary rounded" style="padding: 1rem;">
+							<form id="Form1" action="" method="get">
+								<div class="container col-12">
+									<div class="row">
+										<div class="form-group col-6" style="padding-left: 0rem;margin-bottom: 0.3125rem;">
+											<label for="ClusterForm1" style="margin-bottom: 0rem;">Cluster:</label>
+											<select class="form-control" id="ClusterForm1"  name="cluster">
+												{% for cluster_value in cluster_list %}
+												<option {% if cluster == cluster_value %} selected="selected" {% endif %} value='{{ cluster_value }}'>{{ cluster_value }}</option>
+												{% endfor %}
+											</select>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						
+						<div class="container col-12">
+							<div class="row">
+								<div class="col-12" style="padding: 0;">
+									<div id="heatmap"></div>
+								</div>
+							</div>
+							<div id="line-chart"></div>	
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+
+			<!-- 底部 -->
+			{% include 'public_templates/footer.html' %}
+			<!--		start 定时任务拉取分析任务状态，和结果数据-->
+					<script>
+						var global_data = {};
+						let analysisId = '{{ analysisId }}'
+						$(document).ready(function(){
+			
+			
+							function getCookie(cname)
+							{
+								var name = cname + "=";
+								var ca = document.cookie.split(';');
+								for(var i=0; i<ca.length; i++)
+								{
+									var c = ca[i].trim();
+									if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+								}
+								return "";
+							}
+
+
+
+							function updateCharts() {
+								console.log("charts 内部：" + JSON.stringify(global_data.trend_data))
+								var trend_data = global_data.trend_data;
+								var heatmap_data = global_data.heatmap_data;
+
+								var selectedCluster = document.getElementById('ClusterForm1').value;
+								console.log(9999)
+								console.log(selectedCluster)
+								// Update heatmap
+								var heatmapTrace = {
+									type: 'heatmap',
+									x: (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : heatmap_data[selectedCluster].x,
+									y: (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : heatmap_data[selectedCluster].y,
+									z: (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : heatmap_data[selectedCluster].z,
+									colorscale: [['0.0', 'rgb(94,79,162)'], ['0.1', 'rgb(50,136,189)'], ['0.2', 'rgb(102,194,165)'], ['0.3', 'rgb(171,221,164)'], ['0.4', 'rgb(230,245,152)'], ['0.5', 'rgb(255,255,191)'], ['0.6', 'rgb(254,224,139)'], ['0.7', 'rgb(253,174,97)'], ['0.8', 'rgb(244,109,67)'], ['0.9', 'rgb(213,62,79)'], ['1.0', 'rgb(158,1,66)']],
+									showscale: true,
+									colorbar: { title: 'Z-Score' },
+								};
+			
+								var heatmapLayout = {
+									title: 'Heatmap',
+									bargap: 0.1,
+									legend: {
+										font: { color: '#666666' },
+										bgcolor: '#FFFFFF',
+										title: { text: 'z-Score' }
+									},
+									xaxis: {
+										title: 'Time Serie',
+										showgrid: true,
+										tickfont: { color: '#666666' },
+										gridcolor: '#F6F6F6',
+										titlefont: { color: '#666666' },
+										zerolinecolor: '#F6F6F6'
+									},
+									yaxis: {
+										title: 'Gene Expression Value',
+										showgrid: true,
+										tickfont: { color: '#666666' },
+										gridcolor: '#F6F6F6',
+										titlefont: { color: '#666666' },
+										zerolinecolor: '#F6F6F6',
+										showticklabels: false,
+										ticks: ''
+									},
+									titlefont: { color: '#151516' },
+									plot_bgcolor: '#E5E5E5',
+									paper_bgcolor: '#FFFFFF'
+								};
+			
+								Plotly.newPlot('heatmap', [heatmapTrace], heatmapLayout);
+			
+								// Update line chart
+								var time =  (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : global_data.trend_data[selectedCluster].x;
+								var geneData = (typeof selectedCluster === 'undefined'  || selectedCluster === '' ) ? 0 : global_data.trend_data[selectedCluster].y;
+								console.log(trend_data)
+								var traceData = [];
+								for (var gene in geneData) {
+									var trace = {
+										x: time,
+										y: geneData[gene],
+										name: gene,
+										type: 'scatter'
+									};
+									traceData.push(trace);
+								}
+			
+								var lineChartLayout = {
+									title: 'Time Series Trend Chart',
+									xaxis: {
+										title: 'Time Series'
+									},
+									yaxis: {
+										title: 'Gene Expression Value'
+									}
+								};
+			
+								Plotly.newPlot('line-chart', traceData, lineChartLayout);
+							}
+
+                            $("#ClusterForm1").change(function () {
+                                updateCharts();
+                            });
+
+			
+							var timer = setInterval(function () {
+								$.ajax({
+									url: "/GeTeSEPdb/get_analysis_result_data?analysisId=" + analysisId,
+									type: "GET",
+									headers: {
+										// csrf处理
+										"X-CSRFToken": getCookie("csrftoken")
+									},
+									data: {},
+									contentType: false,
+									processData: false,
+									success: function (data) {
+										if (data.status === 1) {
+											console.log("后台返回数据了");
+
+                                            $("#data-loading-area").hide();
+                                            $("#data-show-area").show();
+
+											global_data.heatmap_data = data.data.heatmap_data
+											global_data.trend_data = data.data.trend_data
+											global_data.EvaIndicator_df = data.data.EvaIndicator_df
+											global_data.ModelDF_df = data.data.ModelDF_df
+                                            global_data.cluster_list = data.data.cluster_list
+											console.log("后台返回数据为：" + JSON.stringify(global_data.trend_data))
+			
+											global_data.cluster_list.forEach(c => {
+												$('#ClusterForm1').append($('<option value="' + c + '">' + c  + '</option>'));
+											})
+																			
+											// Initialize the charts with the selected cluster
+											updateCharts();
+											<!--初始化Datatables-->
+											$('#EvaIndicator').DataTable({
+												data: global_data.EvaIndicator_df,
+												//order: [[ 4, "asc" ],[ 3, "desc"]],
+												dom: "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-8'i><'col-sm-12 col-md-3'f>>" +
+														"<'row'<'col-sm-12'tr>>" +
+														"<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'p>>",
+												buttons: [{
+													extend: 'csv',
+													text: "",
+													className: "icon_",
+												}],
+												columns: [
+													{
+														data: 'model'
+													},
+													{ data: 'rmse' },
+													{ data: 'rsq' },
+													{ data: 'aic' },
+													{ data: 'cluster' },
+												]
+											});
+			
+											$('#ModelDF').DataTable({
+												data: global_data.ModelDF_df,
+												//order: [[ 4, "asc" ],[ 3, "desc"]],
+												dom: "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-8'i><'col-sm-12 col-md-3'f>>" +
+														"<'row'<'col-sm-12'tr>>" +
+														"<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'p>>",
+												buttons: [{
+													extend: 'csv',
+													text: "",
+													className: "icon_",
+												}],
+												columns: [
+													{
+														data: 'cluster'
+													},
+													{ data: 'model' },
+													{ data: 'parameters' },
+													{ data: 'exp' },
+												]
+											});
+											console.log("数据渲染完了")
+			
+											// 清除定时器
+											clearInterval(timer)
+										} else if (data.status === 2) {
+											console.log("跑失败了")
+										} else {
+                                            console.log("任务未完成。。。")
+                                        }
+									},
+									error: function () {
+										alert("上传失败！");
+									}
+								});
+							}, 10000)
+			
+						});
+					</script>
+			<!--		end  定时任务拉取分析任务状态，和结果数据 -->
+			
+
+			
+		</body>
+		
+</html>

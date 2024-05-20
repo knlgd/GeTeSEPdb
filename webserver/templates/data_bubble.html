@@ -1,0 +1,198 @@
+<h3 class="panel-heading" id="list-item-4"
+	style="margin: 1rem 0 0rem 0 ;background-color: #17a2b8;color: #ffffff;">Enriched Functions/Pathways</h3>
+						<div class="border border-secondary rounded" style="padding: 1rem;">
+						    <form id='Form2' action="/GeTeSEPdb/detail/{{ studyid }}" method="get">
+						        <div class="container col-12">
+						            <div class="row">
+						                <div class="form-group col-6" style="padding-left: 0rem;margin-bottom: 0.3125rem;">
+						                    <label for="ClusterForm2" style="margin-bottom: 0rem;">Cluster:</label>
+						                    <select class="form-control" id="ClusterForm2" onchange="Change()" name='cluster'>
+						                        {% for cluster_value in cluster_list %}
+						                            <option {% if cluster == cluster_value %} selected="selected"{% endif %}>{{ cluster_value }}</option>
+						                        {% endfor %}
+						                    </select>
+						                </div>
+						                <div class="form-group col-4" style="padding-left: 0rem;" id="type">
+						                    <label for="PlotForm" style="margin-bottom: 0rem;">Type:</label>
+						                    <select class="form-control" id="PlotForm" onchange="Change_enrich()" name='type'>
+						                        <option {% if type == 'go' %} selected="selected"{% endif %}>GO</option>
+						                        <option {% if type == 'kegg' %} selected="selected"{% endif %}>KEGG</option>
+						                    </select>
+						                </div>
+						            </div>
+						        </div>
+						    </form>
+						</div>
+
+
+
+
+<!-- Tab panes -->
+<div class="tab-content" id="myTabContent" style="color: #17a2b8;background-color: #ffffff;">
+	<div id="go" class="container tab-pane  active text-center" ><br>
+	{% if go_exist_or_not != 'Notexist' %}
+		<button class="btn btn-info" style="margin-left: 5px;margin-top: 20px;" type="submit" id="bp" zzy='bp'>Biological Process</button>
+		<button class="btn btn-info" style="margin-left: 5px;margin-top: 20px;" type="submit" id="cc" zzy='cc'>Cellular Component</button>
+		<button class="btn btn-info" style="margin-left: 5px;margin-top: 20px;" type="submit" id="mf" zzy='mf'>Molecular Function</button>
+		<!-- <button disabled="disabled" id="kegg_" zzy='kegg_'>KEGG</button> -->
+	<div id="gobubble"></div>
+	{% else %}
+		<div class="container col-12">
+			Not Available
+		</div>
+	{% endif %}
+	</div>
+
+	<input style="display: none;" type="text" id="kegg_"  zzy='kegg'/>
+	{% if kegg_exist_or_not != 'Notexist' %}
+		<p id='kegg_value' style="display: none;">kegg</p>
+		<div class="container col-12">
+			<div id="keggbubble" style="width: 100%;"></div>
+		</div>
+
+	{% else %}
+		<div class="container col-12">
+			Not Available
+		</div>
+	{% endif %}
+	</div>
+</div>
+
+
+<!-- bubble -->
+<script>
+	layout_bubble = {
+		title: '',
+		width: 1000,
+		legend: {
+			font: {
+				color: '#4D5663'
+			},
+			bgcolor: '#F5F6F9'
+		},
+		xaxis1: {
+			title: '-Log10(P.adjust)',
+			// showgrid: true,
+			tickfont: {
+				color: '#4D5663'
+			},
+			gridcolor: '#E1E5ED',
+			titlefont: {
+				color: '#4D5663'
+			},
+		zerolinecolor: '#E1E5ED'
+		},
+		yaxis1: {
+			title: '',
+		// showgrid: true,
+			tickfont: {
+				color: '#4D5663'
+			},
+			gridcolor: '#E1E5ED',
+		titlefont: {
+				color: '#4D5663'
+			},
+			zerolinecolor: '#E1E5ED'
+		},
+		titlefont: {
+			color: '#4D5663'
+		},
+		plot_bgcolor: '#ffffff',
+		paper_bgcolor: '#ffffff',
+		margin: {
+			l:400,
+			r:80,
+			t:80,
+			b:80
+		}
+	};
+	Plotly.newPlot('gobubble', {
+		data: {{enrich_obj |safe}},
+		layout: layout_bubble
+	});
+</script>
+
+<script>
+		// GO
+		function pass_enrichfun(input_id,entichtype){
+			// console.log('this:',$(this).text())
+			var formData=new FormData();
+			// formData.append('gene',fc_table.row(this).data()['symbol'])
+			formData.append('ont',$(input_id).attr('zzy'))
+			formData.append('studyid',$('#studyid').val())
+			formData.append('cluster',$('#ClusterForm2').val())
+			// console.log($(this).parent().parent().attr('role'))
+			path_url='/GeTeSEPdb/get_bubble?'+Math.random()
+
+		   // console.log('API row values: ', formData);
+		   $.ajax({
+			url:path_url,
+			type:"POST",
+			headers: {"X-CSRFToken": csrftoken},
+			data:formData,
+			processData:false,
+			contentType:false,
+			success:function(enrich_obj){
+				console.log(111)
+				console.log(enrich_obj)
+				// console.log(enrich_obj == 'null' )
+				if (enrich_obj != 'null'){
+					enrich_obj_decode=JSON.parse(enrich_obj)
+					// console.log(123456)
+					// console.log('enrich_obj_decode: ',enrich_obj_decode)
+					// Plotly.react(entichtype, {
+					// 	data: enrich_obj_decode,
+					// 	layout: layout_bubble
+					// });
+					Plotly.react(entichtype, {
+						data: enrich_obj_decode,
+						layout: layout_bubble
+					});
+				}
+			}
+		   })
+		   // window.location.href = 'detail/'+ sample_id;
+		  }
+		
+		function Change() {
+			var selectedCluster = document.getElementById('ClusterForm2').value
+			var type = document.getElementById('PlotForm').value
+            if (type === 'GO') {
+                pass_enrichfun('#bp','gobubble')
+                $('#go').show()
+				$('#gobubble').show()
+				$('#keggbubble').hide()
+            }
+            if (type === 'KEGG') {
+                pass_enrichfun('#kegg_','keggbubble')
+                $('#go').hide()
+				$('#gobubble').hide()
+				$('#keggbubble').show()
+            }
+
+		}
+		function Change_enrich() {
+			var selectedCluster = document.getElementById('PlotForm').value
+			console.log(selectedCluster)
+			if (selectedCluster == 'KEGG'){
+				pass_enrichfun('#kegg_','keggbubble')
+				$('#go').hide()
+				$('#gobubble').hide()
+				$('#keggbubble').show()
+			}else{
+				pass_enrichfun('#bp','gobubble')
+				$('#go').show()
+				$('#gobubble').show()
+				$('#keggbubble').hide()
+			}
+			
+		}
+		$(document).ready(function(){
+			// var selectedCluster = document.getElementById('ClusterForm2').value
+			$('#go_bp').click(function(){pass_enrichfun('#bp','gobubble')})
+			$('#bp').click(function(){pass_enrichfun('#bp','gobubble')})
+			$('#cc').click(function(){pass_enrichfun('#cc','gobubble')})
+			$('#mf').click(function(){pass_enrichfun('#mf','gobubble')})
+			$('#kegg_').click(function(){pass_enrichfun('#kegg','keggbubble')})
+		})
+</script>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HELP</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		{% include 'public_templates/bootstrap.html' %}
+		<style>
+			#necessary {color: red;}
+			#content_body h3,h5{
+				padding-top: 140px;
+				margin-top: -140px;
+			}
+			#help_nav a{
+				/* border-bottom: 1px solid black; */
+				/* border-radius: unset; */
+
+			}
+			.last{
+				display: none;
+			}
+			#nav_2,#nav_2_1{
+				/* display: none; */
+			}
+			.nav-pills .nav-link.active, .nav-pills .show>.nav-link{background-color: #17a2b8;}
+			h3{color: white;font-size: 23px;}
+			h5{margin-bottom: 20px;font-weight: bolder;}
+			h6{font-size: 18px;}
+			.row-mark .row img{padding:0 0 8px 20px;}
+			.card-header{font-size: 22px;}
+			.navbar.navbar-dark.text-white.bg-dark{padding-left: 30px;}
+			/* .blockquote-footer{font-size: 18px;} */
+			.item-2 .card-body{padding: 4px;}
+			.item-2 .card-body p{padding: 10px;}
+			#first_title{
+				font-size: 18px;
+				font-weight: bolder;
+			}
+			#navbar-example3{
+				position: fixed;
+				width: 300px;
+				margin-left: 30px;
+				border: 1px solid #000000;
+				border-radius: 10px 10px 10px 10px;
+				/* height: 610px; */
+				margin-bottom: 50px;
+			}
+			#navbar-example3 a{
+				padding-top: 1px;
+				padding-bottom: 1px;
+
+			}
+			/* 右箭头标记 */
+			.mark-symbol{
+				color: #6495ED;font-size: 25px;
+				padding-left: 1.5rem;
+				font-weight: lighter;
+			}
+
+		</style>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#nav_help").addClass("active");
+				$("#quanju_nav").addClass("fixed-top");
+				$("#last_nav").removeClass("active");
+				$("#page_title").text('HELP');
+
+			});
+		</script>
+	</head>
+	<body data-spy="scroll" data-target="#navbar-example3" style="padding-top: 100px;">
+		<!-- 导航栏 -->
+		{% include 'public_templates/nav_tem.html' %}
+
+
+		<br />
+		<div class="container-fluid col-12" style="margin-top: 10px;">
+			<div class="row">
+				<div id="help_nav" class="col-3 d-none d-xl-block">
+					<nav id="navbar-example3" class="navbar navbar-light bg-light flex-column" style="margin-bottom: 50px;margin-left: 120px;">
+						<!-- <a class="navbar-brand" href="#" style="font-weight: bold;">DDPD</a> -->
+						<nav class="nav nav-pills flex-column">
+							<!-- 一级标题 -->
+							<a id="first_title" class="nav-link " href="#item-1">About</a>
+							<!-- 二级标题 -->
+							<nav class="nav nav-pills flex-column">
+								<a class="nav-link ml-3 my-1 " href="#item-1-1">Genes With Temporal-specific Expression Patterns</a>
+								<a class="nav-link ml-3 my-1" href="#item-1-2">Linear and Nonlinear Parametric Models</a>
+								<a class="nav-link ml-3 my-1" href="#item-1-3">Datasets</a>
+								<a class="nav-link ml-3 my-1" href="#item-1-4">Methods</a>
+							</nav>
+							<a id="first_title" class="nav-link" href="#item-2">GeTeSEPdb Function Introduction</a>
+							<nav class="nav nav-pills flex-column">
+								<a class="nav-link ml-3 my-1 " href="#item-2-1">HOME</a>
+								<a class="nav-link ml-3 my-1 " href="#item-2-8">Search Result Page</a>
+								<a class="nav-link ml-3 my-1 " href="#item-2-9">Study Detailed Information Page</a>
+								<a class="nav-link ml-3 my-1" href="#item-2-10">Gene Detailed Information Page</a>
+								<a class="nav-link ml-3 my-1 " href="#item-2-2">SEARCH</a>
+								<a class="nav-link ml-3 my-1" href="#item-2-3">BROWSE</a>
+								<a class="nav-link ml-3 my-1" href="#item-2-4">ANALYSIS</a>
+								<a class="nav-link ml-3 my-1" href="#item-2-5">STATISTICS</a>
+								<a class="nav-link ml-3 my-1" href="#item-2-6">DOWNLOAD</a>
+								<a class="nav-link ml-3 my-1" href="#item-2-7">HELP</a>
+							</nav>
+							<a id="first_title" class="nav-link" href="#item-3">Contact Us</a>
+							<!-- <nav class="nav nav-pills flex-column">
+								<a class="nav-link ml-3 my-1" href="#item-3-1">Item 3-1</a>
+								<a class="nav-link ml-3 my-1" href="#item-3-2">Item 3-2</a>
+							</nav> -->
+							<a class="nav-link last" href="#item-last">last</a>
+							<nav id="last_nav" class="nav nav-pills flex-column last">
+								<a class="nav-link ml-3 my-1 last" href="#item-last-1">last-1</a>
+								<a class="nav-link ml-3 my-1 last" href="#item-last-2">last-2</a>
+							</nav>
+						</nav>
+					</nav>
+				</div>
+				<div class="col-xl-7 col-lg-12" style="padding-right: 5%;">
+					{% include 'public_templates/page_title.html' %}
+
+					<div id="content_body" data-spy="scroll" data-target="#navbar-example3" data-offset="0" class="scrollspy-example-1">
+						<!-- 第一部分 -->
+
+							<div class="card-body item-2" style="width: 100%;">
+							<nav class="navbar navbar-dark text-white bg-info" style="border-radius: 10px 10px 0px 0px;">
+								<h3 id="item-1">About</h3>
+							</nav>
+
+
+							<div class="card border-secondary mb-3" style="border-radius: unset;">
+								<!-- 特征一 -->
+								<h5 id="item-1-1"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									Genes profiles with Temporal-specific Expression Patterns
+								</div>
+								<div class="card-body row-mark">
+									<p>Genes profiles with temporal-specific expression patterns were defined as those whose 
+									expression has a specific pattern with respect to time.</p>
+								</div>
+								<!-- 特征二 -->
+								<h5 id="item-1-2"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									Linear and Nonlinear Parametric Models
+								</div>
+								<div class="card-body row-mark">
+									<p>Using a high-throughput regression analysis approach, eight linear and nonlinear parametric 
+									models (linear, constant, logistic, logarithmic, exponential, power, trigonometric, quadratic functions) 
+									were fitted to gene expression profiles from time-series experiments to identify eight types of genes 
+									with temporal-specific expression patterns. They serve as biological representations of diverse gene expression patterns.
+										<li><strong>Linear Model:</strong> captures genes profiles with linear expression changes over time, 
+										aiding in the study of developmental processes or responses to stimuli.
+										<li><strong>Constant Model:</strong> identifies genes profiles with stable expression levels over time, serving as internal controls or reference genes.
+										<li><strong>Logistic Model:</strong> identifies genes profiles exhibiting gradual transitions or switch-like behavior, such as in cell differentiation or fate determination.
+										<li><strong>Logarithmic Model:</strong> detecting genes profiles with linear growth or decay patterns, related to aging, proliferation, and metabolic processes.
+										<li><strong>Exponential Model:</strong> identifies genes profiles with exponential growth or decay patterns, applicable to cellular growth and viral replication.
+										<li><strong>Power Model:</strong> captures genes profiles with power-law relationships, indicating involvement in complex regulatory networks or signaling pathways.
+										<li><strong>Trigonometric Model:</strong> identifies genes profiles with cyclic or periodic expression patterns, relevant in circadian rhythms and cell cycle progression.
+										<li><strong>Quadratic Model:</strong> detects genes profiles with concave or convex expression patterns, aiding in the study of biological processes with distinct phases or transitions.
+										</p>
+								</div>
+								<!-- 特征三 -->
+								<h5 id="item-1-3"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									Datasets
+								</div>
+								<div class="card-body row-mark">
+									<p>We manually collected and curated raw data from 2684 time-series transcriptomic datasets in the Gene Expression Omnibus (GEO) and ArrayExpress repositories. 
+									These datasets were derived from well-conducted time course studies (that had at least five time points) involving humans and various other organisms. </p>
+
+<!-- 									<h6><span class="mark-symbol" style="padding-left: 0;">></span>Neonates, Infants, Children, Adolescents, Adults, Elderly, Geriatric.</h6> -->
+								</div>
+								<h5 id="item-1-4"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									Methods
+								</div>
+								<div class="card-body row-mark">
+									<p>For gene expression data, we clustered subsets of genes using Clust and performed regression analysis to identify patterns.</p>
+
+<!-- 									<h6><span class="mark-symbol" style="padding-left: 0;">></span>Neonates, Infants, Children, Adolescents, Adults, Elderly, Geriatric.</h6> -->
+								</div>
+
+
+							</div>
+						</div>
+						<!-- 第二部分 -->
+						<div class="card-body item-2" style="width: 100%;">
+							<nav class="navbar navbar-dark text-white bg-info" style="border-radius: 10px 10px 0px 0px;">
+								<h3 id="item-2">GeTeSEPdb Function Introduction</h3>
+							</nav>
+							<div class="card border-secondary mb-3" style="border-radius: unset;padding: 5px;">
+								<!-- 特征一 -->
+								<h5 id="item-2-1"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									HOME
+								</div>
+
+								<div class="card-body">
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/home.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<div class="row">
+													<!--  -->
+													<h6></h6>
+												</div>
+												<p>Fuzzy query is enabled. In the main page, time course datasets can be quickly searched by
+												a single gene symbol or a keyword of dataset. </p>
+											</div>
+										</div>
+									</div>
+
+								</div>
+
+								<div class="card-body">
+									<h6 id="item-2-8" style="padding-top: 140px;margin-top: -140px;">Search result page</h6>
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/quicksearch_result.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<div class="row">
+													<!--  -->
+													<h6></h6>
+												</div>
+												<p>Time course datasets that meet the specified criteria are listed separately, and clicking 
+												on the dataset ID leads to a detailed information page about the study. Furthermore, 
+												clicking on a specific gene provides detailed information about that gene.</p>
+											</div>
+										</div>
+									</div>
+
+								</div>
+								<div class="card-body">
+									<h6 id="item-2-9" style="padding-top: 140px;margin-top: -140px;">Study detailed information page</h6>
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/study_detail_1.png" class="card-img" alt="...">
+											<img src="/timecourse_app_static/img/study_detail_2.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<div class="row">
+													<!--  -->
+													<h6></h6>
+												</div>
+												<p>The detailed information page contains available experimental details, evaluation results 
+												of seven models, information about the optimal model, gene expression heat maps/trend maps, 
+												and functional annotation and pathway enrichment results for different model groups.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<h6 id="item-2-9" style="padding-top: 140px;margin-top: -140px;">Gene detailed information page</h6>
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/gene_detail.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<div class="row">
+													<!--  -->
+													<h6></h6>
+												</div>
+												<p>The detailed information page contains the available gene and experimental information, the details 
+												of the gene model, the heat map,trend map of gene expression and fitting.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<h5 id="item-2-2"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									SEARCH
+								</div>
+								<div class="card-body item-2">
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/adv_search.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<div class="row">
+
+													<!-- <h6><span class="mark-symbol">></span>Advanced Search</h6> -->
+												</div>
+												<p>By utilizing these parametric models, researchers can uncover diverse gene expression patterns, 
+												providing insights into regulatory mechanisms and functional implications in different biological contexts.</p>
+												<p>The first five conditions can be arbitrarily selected, and finally enter the gene you want
+							  to query, you can get the screening results.</p>
+													<!-- <p>Step 1: Search for your interested organism.</p>
+													<p>Step 2: Search for your interested experiment type.</p>
+													<p>Step 3: Explore gene expression patterns based on biological model interpretation.</p>
+													<p>Step 4: Narrow down your search by specifying the tissue or cell type you are interested in.</p>
+													<p>Step 5: Choose the desired data type from the available options.</p>
+													<p>Step 6: Finally, search for the genes that you are interested in to 
+													see their common expression patterns under specific time-series experimental conditions.</p> -->
+												
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<h5 id="item-2-3"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									BROWSE
+								</div>
+								<div class="card-body">
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/browse1.png" class="card-img" alt="...">
+											<img src="/timecourse_app_static/img/browse2.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<div class="row">
+													<h6></h6>
+												</div>
+												<p>A list of time course datasets and pattern gene datasets can be viewed in an interactive table on the page. 
+												Users can customize filters based on "Data Type", "Tissue/Cell Type", 
+												and "Organism". Clicking on the "Dataset ID" and "Gene Name" allows access to the corresponding detailed information page.</p>
+											</div>
+										</div>
+									</div>
+
+								</div>
+
+								<h5 id="item-2-4"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									ANALYSIS
+								</div>
+								<div class="card-body">
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/analysis.png" class="card-img" alt="...">
+											<!-- <img src="/timecourse_app_static/img/Analysis_result.png" class="card-img" alt="..."> -->
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<!-- <div class="row">
+													<h6><span class="mark-symbol">></span>Analysis</h6>
+												</div> -->
+												<p>Classification results of gene expression patterns are obtained through Clust and 
+												regression analysis. When users upload correct gene expression data and corresponding 
+												sample time information files, analysis results are displayed and downloadable result files are provided.</p>
+												<p>Step 1: Upload time series gene expression data file.</p>
+												<p>Step 2: Upload sample information data file.</p>
+												<p>Step 3: Submit</p>
+												<p>Consequently, clustering and regression analysis yield classification results for 
+												gene expression patterns. Users can download compressed files containing all the 
+												results by clicking the "Download All Result" button. </p>
+											</div>
+										</div>
+									</div>
+								</div>
+
+
+								<h5 id="item-2-5"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									STATISTICS
+								</div>
+								<div class="card-body">
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/statistic.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<!-- <div class="row">
+
+													<h6><span class="mark-symbol">></span>Drug Property Statistics</h6>
+												</div> -->
+												<p>In the "Statistics" page, the statistics of the time course datasets in multiple
+												perspectives are illustrated. </p>
+											</div>
+										</div>
+									</div>
+
+								</div>
+								
+
+								<h5 id="item-2-6"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									DOWNLOAD
+								</div>
+								<div class="card-body">
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/download.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<div class="row">
+													<h6></h6>
+												</div>
+												<!-- <p> In the Download page, the information of perturbation datasets and
+												available DEGs of each dataset can be downloaded.  </p> -->
+												<p> The Download page provides access to time course datasets information, 
+												available GeTeSEP data, model analysis results, and gene expression profiles 
+												for each dataset, all of which can be downloaded. </p>
+											</div>
+										</div>
+									</div>
+
+								</div>
+								
+								<h5 id="item-2-7"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									HELP
+								</div>
+								<div class="card-body">
+									<div class="row no-gutters">
+										<div class="col-md-6" style="border: 1px dashed #000000;">
+											<img src="/timecourse_app_static/img/help.png" class="card-img" alt="...">
+										</div>
+										<div class="col-md-6">
+											<div class="card-body row-mark">
+												<div class="row">
+													<h6></h6>
+												</div>
+												<p> On the help page, the introduction of the features and the guidelines for the functions are stated.
+												The contact details are attached at the bottom. </p>
+											</div>
+										</div>
+									</div>
+
+								</div>
+
+
+							</div>
+						</div>
+
+						<!-- 第三部分 -->
+						<div class="card-body" style="width: 100%;">
+							<nav class="navbar navbar-dark text-white bg-info" style="border-radius: 10px 10px 0px 0px;">
+								<h3 id="item-3" style=" padding-top: 400px;margin-top: -400px;">Contact Us</h3>
+							</nav>
+							<div class="card border-secondary mb-3" style="border-radius: unset;">
+								<!-- <div class="card-body">
+									<p>The Intelligent bioinformatics research group (InBRG) is a bioinformatics laboratory under
+										Chongqing Medical University, established in 2020 by Dr. Jianbo Pan. At present, InBRG has 2 tutors (1
+										professor and 1 associate professor), 1 doctor and 3 master.
+										The research directions of InBRG in recent five years are as follows:</p>
+									<p>(1)Bioinformatics:
+										Pharmacogenomics research by bioinformatics assisted; Cancer omics data analysis and multi-omics integration
+										study; Development of bioinformatics databases and analytical tools; Discovery and validation of tumor
+										autoantibody markers based on protein microarray;</p>
+									<p>(2) Machine Learning:
+										Use and design computational methods based on statistical learning and knowledge transfer to discover
+										protein
+										and gene expression patterns in different disease pathways; Development of new mathematical and
+										computational
+										methods to identify the expression patterns of complex, high-dimensional omics data and to build predictive
+										models for individualized diagnosis and management of disease.</p>
+								</div> -->
+								<!-- 特征一 -->
+								<h5 id="item-3-1"></h5>
+								<!-- 								<div class="card-header" style="margin-top: -20px;">
+									Contact
+								</div> -->
+								<div>
+									<ul class="list-group list-group-flush">
+										<!-- <li class="list-group-item">Intelligent bioinformatics research group (InBRG) </li> -->
+										<li class="list-group-item">
+											Please feel free to contact Prof. <b><a href="http://www.inbirg.com/team-jacob.html">Jianbo Pan</a></b> with respect to any details pertaining to GeTeSEP.
+										</li>
+										<li class="list-group-item">
+											<div class="row">
+												<p class="card-text"><span class="mark-symbol" style="padding-left: 0;">></span><b>Address :</b></p>
+											</div>
+											<p style="padding:20px 0 0 0px;line-height: 1.0;">Center for Novel Target and Therapeutic Intervention,
+												Institute of Life Sciences, Chongqing Medical University, </p>
+											<p style="padding-left: 0px;line-height: 1.0;">No. 1 Yixueyuan Road, Yuzhong District, Chongqing, 400016,
+												P. R. China.</p>
+										</li>
+										<li class="list-group-item">
+											<div class="row">
+												<p class="card-text"><span class="mark-symbol" style="padding-left: 0;">></span><b>Email :</b></p>
+											</div>
+											<p style="padding:20px 0 0 0px;">panjianbo@cqmu.edu.cn</p>
+										</li>
+
+										<!-- <li class="list-group-item">
+											<div class="row">
+												<img src="/pertorg_static/img/home_img/home_right_direct.svg" style="padding-top: 5px;" />
+												<p class="card-text"><b>Postcode :</b></p>
+											</div>
+											<span style="padding-left: 22px;">400016</span>
+										</li> -->
+										<!-- <li class="list-group-item">Phone: +86(23)6848 2539</li>panjianbo@cqmu.edu.cn -->
+										<!-- <li class="list-group-item">
+											Site:
+											<a href="http://cntti.cqmu.edu.cn"> cntti.cqmu.edu.cn</a>
+										</li> -->
+									</ul>
+								</div>
+
+
+								<!-- <h5 id="item-3-2"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									SEARCH
+								</div>
+
+
+								<h5 id="item-3-3"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									BROWSE
+								</div>
+
+								<h5 id="item-3-4"></h5>
+								<div class="card-header" style="margin-top: -20px;">
+									ANALYSIS
+								</div> -->
+
+
+
+
+							</div>
+						</div>
+
+
+
+
+
+						<!-- 用来消除页面的active -->
+						<h4 id="item-last"></h4>
+						<p></p>
+						<h5 id="item-last-1"></h5>
+						<p></p>
+						<h5 id="item-last-2"></h5>
+						<p></p>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+
+		<!-- 底部 -->
+		{% include 'public_templates/footer.html' %}
+	</body>
+</html>

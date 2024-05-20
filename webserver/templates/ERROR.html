@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>BROWSE</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		{% include 'public_templates/bootstrap.html' %}
+
+		<script type="text/javascript">
+			// 加载提示框
+			$(document).ready(function() {
+				// 导航栏加亮
+				$("#page_title").text('ERROR');
+				$("#page_title").css("color","red");
+				// setTimeout("history.go(-1)", 5000);
+			});
+			// browse加href属性
+		</script>
+
+		<script type="text/javascript">
+			// 5s后自动返回
+			// var num = 4;
+
+			// function startCount() {
+			// 	document.getElementById("count").innerText = num;
+			// 	num -= 1;
+			// 	setTimeout(startCount, 1000); //setTimeout是超时调用，使用递归模拟间歇调用
+			// }
+			// setTimeout(startCount, 1000); //1s后执行
+		</script>
+
+	</head>
+	<body>
+		<!-- 导航栏 -->
+		{% include 'public_templates/nav_tem.html' %}
+		<div class="container col-9">
+			<h3 id="page_title" style="margin-top: 2rem;color: #17a2b8;font-size: 25px;"></h3>
+			<h6  style="color: #17a2b8;;font-size: 20px;">
+				{{ error_msg }}
+			</h6>
+			<h6  style="color: #17a2b8;;font-size: 20px;">
+				 <a href="javascript:window.history.back()">Click to Go Back!</a>
+			</h6>
+<!-- 			<div class="row text-center">
+				<h6 id="count" class="text-center" style="color: #17a2b8;;font-size: 20px;">5</h6>seconds go back automatically.
+			</div> -->
+		</div>
+
+
+
+		<br />
+		<br />
+		<br />
+
+		<!-- 底部 -->
+		{% include 'public_templates/footer.html' %}
+	</body>
+</html>
